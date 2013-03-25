@@ -1,0 +1,14 @@
+==Wait or Walk==
+Author: Hunter Scott
+
+A webapp to answer the question you really have at the bus stop: should I wait or should I walk? Scrapes Nextbus (since their public API isn't open for everywhere, including Georgia Tech) and uses the Google Maps API to calculate walking times and distances.
+
+Uses the awesome jQuery Mobile Bootstrap theme by Andy Matthews.
+
+Only supports the blue and red routes at Georgia Tech right now, but next on my list is the Trolley, and then taking the current weather into account (ie, "It would be quicker to walk, but it's raining/really cold, so if you can stick around for x minutes, you can stay dry/warm.")
+
+
+Installation:
+sudo pip install flask
+sudo pip install beautifulsoup
+How to deploy with Apache: http://www.subdimension.co.uk/2012/04/24/Deploying_Flask_to_Apache.html
