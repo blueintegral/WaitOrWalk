@@ -202,7 +202,7 @@ def shouldWait(start, end, route):
 
 def get_time(start, end, method):
 	#Get distance matrix for this trip
-	json_data = open(start+"-"+method+".json").read()
+	json_data = open("data/"+method+"/"+start"+.json").read()
 	data = json.loads(json_data)
 	#figure out destination number
 	if(end == "fitten"):
