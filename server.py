@@ -1,13 +1,15 @@
 #! /usr/bin/env python
+import json
 import os
-from BeautifulSoup import BeautifulSoup, SoupStrainer
-from urllib import urlopen
-import urllib2
 import sys
 import time
+import urllib2
+
+from BeautifulSoup import BeautifulSoup, SoupStrainer
 from datetime import datetime
 from flask import Flask, render_template, request
-import json
+from urllib import urlopen
+
 app= Flask(__name__)
 
 thetime = time.time()
