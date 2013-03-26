@@ -12,9 +12,9 @@ from urllib import urlopen
 
 app = Flask(__name__)
 
-thetime = time.time()
+startTime = time.time()
 cold = 0
-rainy = 0
+rain = 0
 
 @app.route('/')
 def index():
@@ -27,27 +27,27 @@ def how():
 @app.route('/weather')
 def weather():
 	# Check current conditions every 5 minutes
-	global thetime
+	global startTime
 	global cold
-	global rainy
+	global rain
 
-	if (time.time() - thetime > 300):
-		thetime = time.time() # Reset timer
-		f = urllib2.urlopen('http://api.wunderground.com/api/your-api-key-here/conditions/q/30332.json')
-		json_string = f.read()
-		parsed_json = json.loads(json_string)
+	if (time.time() - startTime > 300):
+		startTime = time.time() # Reset timer
+		urlResult = urllib2.urlopen('http://api.wunderground.com/api/your-api-key-here/conditions/q/30332.json')
+		rawJSON = urlResult.read()
+		parsedJSON = json.loads(rawJSON)
 
-		temperature = parsed_json['current_observation']['temp_f']
+		temperature = parsedJSON['current_observation']['temp_f']
 
 		if (temperature < 60):
 			cold = 1 # It's cold
 
-		conditions = parsed_json['current_observation']['weather']
+		conditions = parsedJSON['current_observation']['weather']
 
 		if (conditions == 'Light Drizzle' or conditions == 'Heavy Drizzle' or conditions == 'Light Rain' or conditions == 'Heavy Rain' or conditions == 'Light Hail' or conditions == 'Heavy Hail' or conditions == 'Light Rain Mist' or conditions == 'Heavy Rain Mist' or conditions == 'Light Rain Showers' or conditions == 'Heavy Rain Showers' or conditions == 'Light Hail Showers' or conditions == 'Heavy Hail Showers' or conditions == 'Light Small Hail Showers' or conditions == 'Heavy Small Hail Showers' or conditions == 'Light Thunderstorm' or conditions == 'Heavy Thunderstorm' or conditions == 'Light Thunderstorms and Rain' or conditions == 'Heavy Thunderstorms and Rain' or conditions == 'Light Thunderstorms with Hail' or conditions == 'Heavy Thunderstorms with Hail' or conditions == 'Light Thunderstorms with Small Hail' or conditions == 'Heavy Thunderstorms with Small Hail' or conditions == 'Light Freezing Drizzle' or conditions == 'Heavy Freezing Drizzle' or conditions == 'Light Freezing Rain' or conditions == 'Heavy Freezing Rain' or conditions == 'Small Hail'):
-			rainy = 1 # It's raining
+			rain = 1 # It's raining
 
-	if (rainy):
+	if (rain):
 		return str(1)
 	elif (cold):
 		return str(2)
@@ -63,10 +63,10 @@ def start_api():
 			end = request.args['end']
 
 			route = getRoute(start, end)
-			result = shouldWait(start, end, route)
-			waittime = getNextBusTime(start, route)
+			waitResult = shouldWait(start, end, route)
+			busResult = getNextBusTime(start, route)
 
-			return  ' '.join([str(result), str(waittime)])
+			return  ' '.join([str(waitResult), str(busResult)])
 
 def getRoute(start, end):
 	if (start == "fitten"):
@@ -161,9 +161,10 @@ def getNextBusTime(start, route):
 	'''
 	# Need to fake a user agent or else nextbus will reject the connection
 			
-	req = urllib2.Request("http://www.nextbus.com/predictor/simplePrediction.shtml?a=georgia-tech&r=" + route + "&s=" + start)
-	req.add_header('User-agent','Mozilla/5.0')
-	result = urllib2.urlopen(req)
+	request = urllib2.Request("http://www.nextbus.com/predictor/simplePrediction.shtml?a=georgia-tech&r=" + route + "&s=" + start)
+	request.add_header('User-agent','Mozilla/5.0')
+
+	result = urllib2.urlopen(request)
 	response = result.read()
 
 	# Scrape prediction
@@ -214,8 +215,8 @@ def shouldWait(start, end, route):
 
 def get_time(start, end, method):
 	# Get distance matrix for this trip
-	json_data = open("data/" + method + "/" + start + ".json").read()
-	data = json.loads(json_data)
+	rawJSON = open("data/" + method + "/" + start + ".json").read()
+	parsedJSON = json.loads(rawJSON)
 
 	# Figure out destination number
 	if (end == "fitten"):
@@ -253,8 +254,8 @@ def get_time(start, end, method):
 	if (end == "765femrt"):
 		end = 16
 		
-	expectedTime = data["rows"][0]["elements"][end]["duration"]["value"]
-	expectedTime = int(expectedTime)/60 #convert to minutes
+	expectedTime = parsedJSON["rows"][0]["elements"][end]["duration"]["value"]
+	expectedTime = int(expectedTime) / 60 # Convert to minutes
 	
 	return expectedTime
 
