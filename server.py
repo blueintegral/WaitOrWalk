@@ -2,15 +2,11 @@
 import os
 from BeautifulSoup import BeautifulSoup, SoupStrainer
 from urllib import urlopen
-import urllib
 import urllib2
-import string
 import sys
 import time
-import re
 from datetime import datetime
 from flask import Flask, render_template, request
-import subprocess
 import json
 app= Flask(__name__)
 
@@ -157,7 +153,6 @@ def getNextBusTime(start, route):
 	'''
 	#Need to fake a user agent or else nextbus will reject the connection
 			
-	opener = urllib2.build_opener(urllib2.HTTPHandler)
 	req = urllib2.Request("http://www.nextbus.com/predictor/simplePrediction.shtml?a=georgia-tech&r="+route+"&s="+start)
 	req.add_header('User-agent','Mozilla/5.0')
 	result = urllib2.urlopen(req)
