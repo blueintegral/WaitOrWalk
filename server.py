@@ -12,7 +12,7 @@ from urllib import urlopen
 
 app = Flask(__name__)
 
-startTime = time.time()
+lastWeatherCheckTime = time.time()
 cold = 0
 rain = 0
 
@@ -27,12 +27,12 @@ def how():
 @app.route('/weather')
 def weather():
 	# Check current conditions every 5 minutes
-	global startTime
+	global lastWeatherCheckTime
 	global cold
 	global rain
 
-	if (time.time() - startTime > 300):
-		startTime = time.time() # Reset timer
+	if (time.time() - lastWeatherCheckTime > 300):
+		lastWeatherCheckTime = time.time() # Reset timer
 		urlResult = urllib2.urlopen('http://api.wunderground.com/api/your-api-key-here/conditions/q/30332.json')
 		rawJSON = urlResult.read()
 		parsedJSON = json.loads(rawJSON)
