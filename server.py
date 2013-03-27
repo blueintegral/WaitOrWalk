@@ -13,8 +13,8 @@ from urllib import urlopen
 app = Flask(__name__)
 
 lastWeatherCheckTime = time.time()
-cold = 0
-rain = 0
+cold = False
+rain = False
 
 @app.route('/')
 def index():
@@ -40,12 +40,12 @@ def weather():
 		temperature = parsedJSON['current_observation']['temp_f']
 
 		if (temperature < 60):
-			cold = 1 # It's cold
+			cold = True # It's cold
 
 		conditions = parsedJSON['current_observation']['weather']
 
 		if (conditions == 'Light Drizzle' or conditions == 'Heavy Drizzle' or conditions == 'Light Rain' or conditions == 'Heavy Rain' or conditions == 'Light Hail' or conditions == 'Heavy Hail' or conditions == 'Light Rain Mist' or conditions == 'Heavy Rain Mist' or conditions == 'Light Rain Showers' or conditions == 'Heavy Rain Showers' or conditions == 'Light Hail Showers' or conditions == 'Heavy Hail Showers' or conditions == 'Light Small Hail Showers' or conditions == 'Heavy Small Hail Showers' or conditions == 'Light Thunderstorm' or conditions == 'Heavy Thunderstorm' or conditions == 'Light Thunderstorms and Rain' or conditions == 'Heavy Thunderstorms and Rain' or conditions == 'Light Thunderstorms with Hail' or conditions == 'Heavy Thunderstorms with Hail' or conditions == 'Light Thunderstorms with Small Hail' or conditions == 'Heavy Thunderstorms with Small Hail' or conditions == 'Light Freezing Drizzle' or conditions == 'Heavy Freezing Drizzle' or conditions == 'Light Freezing Rain' or conditions == 'Heavy Freezing Rain' or conditions == 'Small Hail'):
-			rain = 1 # It's raining
+			rain = True # It's raining
 
 	if (rain):
 		return str(1)
@@ -63,7 +63,7 @@ def start_api():
 			end = request.args['end']
 
 			route = getRoute(start, end)
-			waitResult = shouldWait(start, end, route)
+			waitResult = 1 if shouldWait(start, end, route) else 0
 			busResult = getNextBusTime(start, route)
 
 			return  ' '.join([str(waitResult), str(busResult)])
@@ -169,14 +169,14 @@ def getNextBusTime(start, route):
 
 	# Scrape prediction
 	soup = BeautifulSoup(response)
-	available = 1
+	available = True
 
 	if (not soup):
-		available = 0
+		available = False
 		result = 10000
 
 	if (soup.findAll(text='No prediction') != []):
-		available = 0
+		available = False
 		result = 10000
 
 	if (available):
@@ -209,9 +209,9 @@ def shouldWait(start, end, route):
 
 	# Compare two times
 	if (waitTime < walkTime):
-		return 1
+		return True
 	else:
-		return 0
+		return False
 
 def get_time(start, end, method):
 	# Get distance matrix for this trip
