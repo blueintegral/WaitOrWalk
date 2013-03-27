@@ -66,7 +66,7 @@ def start_api():
 			waitResult = 1 if shouldWait(start, end, route) else 0
 			busResult = getNextBusTime(start, route)
 
-			return ' '.join([str(waitResult), str(busResult)])
+			return str(waitResult) + " " + str(busResult)
 
 def getRoute(start, end):
 	if (start == "fitten"):
