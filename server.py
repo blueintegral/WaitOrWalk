@@ -62,13 +62,13 @@ def start_api():
 			start = request.args['start']
 			end = request.args['end']
 
-			route = getRoute(start, end)
-			wait_result = 1 if shouldWait(start, end, route) else 0
-			bus_result = getNextBusTime(start, route)
+			route = get_route(start, end)
+			wait_result = 1 if should_wait(start, end, route) else 0
+			bus_result = get_nextbus_time(start, route)
 
 			return str(wait_result) + " " + str(bus_result)
 
-def getRoute(start, end):
+def get_route(start, end):
 	if start == "fitten":
 		if end == "fitten" or end == "mcm8th" or end == "8thhemp" or end == "fershemrt" or end == "fersstmrt" or end == "fersatmrt" or end == "ferschmrt" or end == "5thfowl" or end == "tech5th" or end == "tech4th" or end == "techbob" or end == "technorth":
 			# Take the red route  
@@ -156,7 +156,7 @@ def getRoute(start, end):
 
 	return route
 
-def getNextBusTime(start, route):
+def get_nextbus_time(start, route):
 	'''Returns next arrival time for given route and starting point scraped from NextBus.
 	'''
 	# Need to fake a user agent or else nextbus will reject the connection
@@ -192,15 +192,15 @@ def getNextBusTime(start, route):
 
 	return int(result)
 
-def shouldWait(start, end, route):
+def should_wait(start, end, route):
 	'''Actually makes the decision to wait or walk '''
 	# First get the time until next bus
-	wait_time = getNextBusTime(start, route)
+	wait_time = get_nextbus_time(start, route)
 
 	# Now add drive time to that. This should also include amount of time spent at stops.
 	# Add an extra 15 seconds per stop made on the way
 	drive_time = get_time(start, end, "driving") 
-	stops = stopsBetween(start, end)
+	stops = get_stops_between(start, end)
 
 	wait_time = wait_time + drive_time +  0.25 * stops # That's 0.25 minutes
 
@@ -259,7 +259,7 @@ def get_time(start, end, method):
 	
 	return expected_time
 
-def stopsBetween(start, end):
+def get_stops_between(start, end):
 	if start == "fitten":
 		start = 1
 	if start == "mcm8th":
