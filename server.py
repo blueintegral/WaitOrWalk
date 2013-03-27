@@ -66,7 +66,7 @@ def start_api():
 			waitResult = 1 if shouldWait(start, end, route) else 0
 			busResult = getNextBusTime(start, route)
 
-			return  ' '.join([str(waitResult), str(busResult)])
+			return ' '.join([str(waitResult), str(busResult)])
 
 def getRoute(start, end):
 	if (start == "fitten"):
@@ -202,7 +202,7 @@ def shouldWait(start, end, route):
 	driveTime = get_time(start, end, "driving") 
 	stops = stopsBetween(start, end)
 
-	waitTime = waitTime + driveTime +  0.25*stops #that's .25 minutes
+	waitTime = waitTime + driveTime +  0.25 * stops # That's 0.25 minutes
 
 	# Get walk time
 	walkTime = get_time(start, end, "walking")
