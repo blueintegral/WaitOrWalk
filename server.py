@@ -90,6 +90,37 @@ def shouldWait(start_tag, end_tag, route_tag, direction_tag):
 	else:
 		return 0
 
+def get_NextBus_time(stop, direction, route):
+	'''Returns next arrival time for given route and starting point scraped from NextBus.
+	'''
+	#Need to fake a user agent or else nextbus will reject the connection
+
+	opener = urllib2.build_opener(urllib2.HTTPHandler)
+	req = urllib2.Request("http://www.nextbus.com/predictor/simplePrediction.shtml?a=georgia-tech&r="+route+"&d="+ direction +"&s="+stop)
+	req.add_header('User-agent','Mozilla/5.0')
+	result = urllib2.urlopen(req)
+	response = result.read()
+
+	#scrape prediction
+	soup = BeautifulSoup(response)
+	available = 1
+	if(not soup):
+		available = 0
+		result = 10000
+	if(soup.findAll(text='No prediction') != []):
+		available = 0
+		result = 10000
+	if(available):
+		prediction = soup.find('td', {'class':"predictionNumberForFirstPred"})
+		result = []
+		if(prediction and prediction.find('div')):
+			result = prediction.find('div').string.split(';')[1].strip()
+			if(result == "Arriving"):
+				result = 0
+		else:
+			result = 10000
+	return int(result)
+
 def get_time(start, end, method):
 	#Get distance matrix for this trip
 	json_data = open("data/"+method+"/"+start+".json").read()

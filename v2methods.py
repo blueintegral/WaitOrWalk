@@ -4,29 +4,39 @@ import urllib2
 
 output_json = json.load(open('data/routeconfig.txt'))
 
-# key: stop_tag, value: rds
+''' 
+Process for looking up the times for walking and bus.
+	Get start and stop location which are stop tags
+	Convert those to stop titles
+	Find the routes that service both stop titles
+	Convert the stop titles back to the stop tags for the route chosen
+	Call the next bus api with the stop tags
+	Call own api with the stop tags
+'''
+
+# Used to find all the routes/directions that share a certain stop
+# key: stop_title, value: (route_tag, direction_tag, stop_tag).
 shared_stops = dict()
 
-# Gets the stop title from the stop tag
+# Gets the stop title from the stops
 def get_stop_details(stop_tag, stops):
 	for stop in stops:
 		if stop["tag"] == stop_tag:
 			return stop["title"]
-
-def add_to_shared_stops(key, value):
-	if key in shared_stops:
-		shared_stops[key].append(value)
-	else:
-		shared_stops[key] = [value]
 
 # (route, direction, stop)
 def construct_shared_stops():
 	for i in output_json["route"]:
 		for j in i["direction"]:
 			for k in j["stop"]:
-				stop_title = get_stop_details(k["tag"], i["stop"])
-				add_to_shared_stops(stop_title, (i["tag"], j["tag"], k["tag"]))
-
+				key = get_stop_details(k["tag"], i["stop"]) # stop_title
+				value = (i["tag"], j["tag"], k["tag"]) # (R,D,S)
+				if key in shared_stops:
+					shared_stops[key].append(value)
+				else:
+					shared_stops[key] = [value]
+				
+# The start and end stops need to be serviced by the same route/direction
 def get_possible_routes_and_directions(start_title, end_title):
 	start_set = set()
 	stop_set = set()
@@ -58,7 +68,7 @@ def stops_between(start, end, route, direction):
 		return end_index + (num_stops - start_index)
 	# print(start_index, end_index)
 
-def get_NextBus_time(stop, direction, route):
+def get_NextBus_time_unused(stop, direction, route):
 	print (route, direction, stop)
 	response_json = json.load(urllib2.urlopen('http://desolate-escarpment-6039.herokuapp.com/bus/get?route='+route+'&direction='+direction+'&stop='+stop))
 	print ""
