@@ -12,7 +12,7 @@ from urllib import urlopen
 
 app = Flask(__name__)
 
-lastWeatherCheckTime = time.time()
+last_weather_download_time = time.time()
 cold = False
 rain = False
 
@@ -27,22 +27,22 @@ def how():
 @app.route('/weather')
 def weather():
 	# Check current conditions every 5 minutes
-	global lastWeatherCheckTime
+	global last_weather_download_time
 	global cold
 	global rain
 
-	if time.time() - lastWeatherCheckTime > 300:
-		lastWeatherCheckTime = time.time() # Reset timer
-		urlResult = urllib2.urlopen('http://api.wunderground.com/api/your-api-key-here/conditions/q/30332.json')
-		rawJSON = urlResult.read()
-		parsedJSON = json.loads(rawJSON)
+	if time.time() - last_weather_download_time > 300:
+		last_weather_download_time = time.time() # Reset timer
+		url_result = urllib2.urlopen('http://api.wunderground.com/api/your-api-key-here/conditions/q/30332.json')
+		raw_json = url_result.read()
+		parsed_json = json.loads(raw_json)
 
-		temperature = parsedJSON['current_observation']['temp_f']
+		temperature = parsed_json['current_observation']['temp_f']
 
 		if temperature < 60:
 			cold = True # It's cold
 
-		conditions = parsedJSON['current_observation']['weather']
+		conditions = parsed_json['current_observation']['weather']
 
 		if conditions == 'Light Drizzle' or conditions == 'Heavy Drizzle' or conditions == 'Light Rain' or conditions == 'Heavy Rain' or conditions == 'Light Hail' or conditions == 'Heavy Hail' or conditions == 'Light Rain Mist' or conditions == 'Heavy Rain Mist' or conditions == 'Light Rain Showers' or conditions == 'Heavy Rain Showers' or conditions == 'Light Hail Showers' or conditions == 'Heavy Hail Showers' or conditions == 'Light Small Hail Showers' or conditions == 'Heavy Small Hail Showers' or conditions == 'Light Thunderstorm' or conditions == 'Heavy Thunderstorm' or conditions == 'Light Thunderstorms and Rain' or conditions == 'Heavy Thunderstorms and Rain' or conditions == 'Light Thunderstorms with Hail' or conditions == 'Heavy Thunderstorms with Hail' or conditions == 'Light Thunderstorms with Small Hail' or conditions == 'Heavy Thunderstorms with Small Hail' or conditions == 'Light Freezing Drizzle' or conditions == 'Heavy Freezing Drizzle' or conditions == 'Light Freezing Rain' or conditions == 'Heavy Freezing Rain' or conditions == 'Small Hail':
 			rain = True # It's raining
@@ -63,10 +63,10 @@ def start_api():
 			end = request.args['end']
 
 			route = getRoute(start, end)
-			waitResult = 1 if shouldWait(start, end, route) else 0
-			busResult = getNextBusTime(start, route)
+			wait_result = 1 if shouldWait(start, end, route) else 0
+			bus_result = getNextBusTime(start, route)
 
-			return str(waitResult) + " " + str(busResult)
+			return str(wait_result) + " " + str(bus_result)
 
 def getRoute(start, end):
 	if start == "fitten":
@@ -195,28 +195,28 @@ def getNextBusTime(start, route):
 def shouldWait(start, end, route):
 	'''Actually makes the decision to wait or walk '''
 	# First get the time until next bus
-	waitTime = getNextBusTime(start, route)
+	wait_time = getNextBusTime(start, route)
 
 	# Now add drive time to that. This should also include amount of time spent at stops.
 	# Add an extra 15 seconds per stop made on the way
-	driveTime = get_time(start, end, "driving") 
+	drive_time = get_time(start, end, "driving") 
 	stops = stopsBetween(start, end)
 
-	waitTime = waitTime + driveTime +  0.25 * stops # That's 0.25 minutes
+	wait_time = wait_time + drive_time +  0.25 * stops # That's 0.25 minutes
 
 	# Get walk time
-	walkTime = get_time(start, end, "walking")
+	walk_time = get_time(start, end, "walking")
 
 	# Compare two times
-	if waitTime < walkTime:
+	if wait_time < walk_time:
 		return True
 	else:
 		return False
 
 def get_time(start, end, method):
 	# Get distance matrix for this trip
-	rawJSON = open("data/" + method + "/" + start + ".json").read()
-	parsedJSON = json.loads(rawJSON)
+	raw_json = open("data/" + method + "/" + start + ".json").read()
+	parsed_json = json.loads(raw_json)
 
 	# Figure out destination number
 	if end == "fitten":
@@ -254,10 +254,10 @@ def get_time(start, end, method):
 	if end == "765femrt":
 		end = 16
 		
-	expectedTime = parsedJSON["rows"][0]["elements"][end]["duration"]["value"]
-	expectedTime = int(expectedTime) / 60 # Convert to minutes
+	expected_time = parsed_json["rows"][0]["elements"][end]["duration"]["value"]
+	expected_time = int(expected_time) / 60 # Convert to minutes
 	
-	return expectedTime
+	return expected_time
 
 def stopsBetween(start, end):
 	if start == "fitten":
