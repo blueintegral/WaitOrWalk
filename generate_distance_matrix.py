@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 import json
 import urllib2
-import string
 import time
 import os
 '''This script will call Google Maps to calculate the time to walk between every combination of bus stops and the time to drive between every combination of bus stops. We can't do this live in the app because of rate limiting and because Google requires you show a map, which I don't want to do. '''
