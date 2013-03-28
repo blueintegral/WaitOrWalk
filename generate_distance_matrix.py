@@ -7,23 +7,6 @@ import os
 
 #We'll have to go through each of the 17 stops with one origin and all 16 other stops as destinations. So we'll end up with fitten.json, mcm8th.json, etc. Then we can access the json for the specific starting point, find the destination, and get the travel time. Rate limiting prevents doing this in a more elegant way with fewer API calls.
 
-places = ["33.7782,-84.4041","33.7795,-84.4041","33.7796,-84.4029","33.7784,-84.4009","33.7782,-84.3994","33.7782,-84.3975","33.7772,-84.3956","33.7769,-84.3938","33.7797,-84.3921","33.7752,-84.392","33.774,-84.3919","33.7715,-84.3919","33.7701,-84.3917","33.7722,-84.3955","33.7728,-84.397","33.7735,-84.3991","33.7754,-84.4025"]
-
-name = ["fitten", "mcm8th", "8thhemp", "fershemrt", "fersstmrt", "fersatmrt", "ferschmrt", "5thfowl", "tech5th", "tech4th", "techbob", "technorth", "nortavea_a", "ferstcher", "hubfers", "centrstud", "765femrt"]
-print "This will take about 10 minutes, so sit tight."
-
-# Make the driving directory if it does not exist
-if not os.path.exists("data/driving"):
-	os.makedirs("data/driving")
-
-get_times(false)
-
-# Make the walking directory if it does not exist
-if not os.path.exists("data/walking"):
-	os.makedirs("data/walking")
-
-get_times(true)
-
 def get_times(walking):
 	"""Get the travel time either walking or driving to all the bus stops."""
 
@@ -46,6 +29,26 @@ def get_times(walking):
 
 		# Wait for rate limit
 		time.sleep(15)
+
+if __name__ == '__main__':
+	places = ["33.7782,-84.4041","33.7795,-84.4041","33.7796,-84.4029","33.7784,-84.4009","33.7782,-84.3994","33.7782,-84.3975","33.7772,-84.3956","33.7769,-84.3938","33.7797,-84.3921","33.7752,-84.392","33.774,-84.3919","33.7715,-84.3919","33.7701,-84.3917","33.7722,-84.3955","33.7728,-84.397","33.7735,-84.3991","33.7754,-84.4025"]
+
+	name = ["fitten", "mcm8th", "8thhemp", "fershemrt", "fersstmrt", "fersatmrt", "ferschmrt", "5thfowl", "tech5th", "tech4th", "techbob", "technorth", "nortavea_a", "ferstcher", "hubfers", "centrstud", "765femrt"]
+	print "This will take about 10 minutes, so sit tight."
+
+	# Make the driving directory if it does not exist
+	if not os.path.exists("data/driving"):
+		os.makedirs("data/driving")
+
+	# Get the times to drive to all the bus stops
+	get_times(False)
+
+	# Make the walking directory if it does not exist
+	if not os.path.exists("data/walking"):
+		os.makedirs("data/walking")
+
+	# Get the times to walk to all the bus stops
+	get_times(True)
 
 '''
 fitten: 33.7782, 84.4041
