@@ -65,6 +65,11 @@ def start_api():
 
 	(route_tag, direction_tag) = getRoute(start_title, end_title)
 
+	start_tag = stop_key_route_and_title_value_tag[(route_tag, start_title)]
+	end_tag = stop_key_route_and_title_value_tag[(route_tag, end_title)]
+
+	print (start_tag, end_tag, route_tag)
+
 	result = shouldWait(start_tag, end_tag, route_tag, direction_tag)
 	wait_time = get_NextBus_time(start_tag, direction_tag, route_tag)
 	return  ' '.join([str(result), str(wait_time)])
@@ -123,6 +128,11 @@ def get_NextBus_time(stop, direction, route):
 
 def get_time(start, end, method):
 	#Get distance matrix for this trip
+	#	Needs to be fixed when walking data has all stops information
+	if not os.path.isfile("data/"+method+"/"+start+".json"):
+		print "ERROR ERROR ERROR"
+		return
+
 	json_data = open("data/"+method+"/"+start+".json").read()
 	data = json.loads(json_data)
 	#figure out destination number
@@ -160,7 +170,11 @@ def get_time(start, end, method):
 		end = 15
 	if(end == "765femrt"):
 		end = 16
-		
+
+	# Needs to be fixed when walking data has all stops information
+	if isinstance(end, str) or isinstance(end, unicode):
+		print "ERROR ERROR ABORTING"
+		return	1000	
 	expectedTime = data["rows"][0]["elements"][end]["duration"]["value"]
 	expectedTime = int(expectedTime)/60 #convert to minutes
 	

@@ -60,7 +60,20 @@ def get_possible_routes_and_directions(start_title, end_title):
 	for (r, d, s) in shared_stops[end_title]:
 		end_set.add((r, d))
 	# Returns one of possible choices	
-	return start_set.intersection(end_set).pop()
+
+	possible_routes_directions = start_set.intersection(end_set)
+	print possible_routes_directions
+	new_list= list()
+	
+	# Returning the route with the least number of stops, this isn't ideal. A better solution needs to exist for
+	# when two routes service the start/end locations
+	for (r, d) in possible_routes_directions:
+		num_stops = stops_between(stop_title_to_stop_tag_for_route(start_title, r), stop_title_to_stop_tag_for_route(end_title, r), r, d)
+		new_list.append((num_stops, r, d))
+	(num_stops, r, d) = sorted(new_list, reverse=True).pop()
+
+	return (r,d)
+
 
 def stops_between(start_tag, end_tag, route_tag, direction_tag):
 	num_stops = len(route_information[route_tag]["direction"][direction_tag])
@@ -75,8 +88,9 @@ def stops_between(start_tag, end_tag, route_tag, direction_tag):
 
 # Since shared_stops groups by stop_titles, iterate through them to find the stop_tag
 # in (route_tag, direction_tag, stop_tag)
+# Doesn't really need to be a function
 def stop_title_to_stop_tag_for_route(stop_title, route_tag):
-	return stop_key_tile_value_tag[route_tag][stop_title]
+	return stop_key_route_and_title_value_tag[(route_tag,stop_title)]
 
 construct_route_information()
 construct_shared_stops()
