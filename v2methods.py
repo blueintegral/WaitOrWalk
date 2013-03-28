@@ -3,7 +3,6 @@ import pprint
 import urllib2
 
 data_json = json.load(open('data/routeconfig.txt'))
-
 ''' 
 Process for looking up the times for walking and bus.
 	Get start and stop location which are stop tags
@@ -34,9 +33,9 @@ def construct_shared_stops():
 
 def construct_route_information():
 	for route in data_json["route"]:
-		r_info = dict()
-		direction_dict = dict()
-		
+		current_route_info = dict()
+		direction_all_dict = dict()
+
 		for stop in route["stop"]:
 			stop_key_tag_value_title[stop["tag"]] = stop["title"]
 			stop_key_route_and_title_value_tag[(route["tag"], stop["title"])] = stop["tag"]
@@ -46,9 +45,9 @@ def construct_route_information():
 			for stop_index in range(len(direction["stop"])):
 				current_stop = direction["stop"][stop_index]
 				current_direction[current_stop["tag"]] = stop_index
-			direction_dict[direction["tag"]] = current_direction
-		r_info["direction"] = direction_dict
-		route_information[route["tag"]] = r_info
+			direction_all_dict[direction["tag"]] = current_direction
+		current_route_info["direction"] = direction_all_dict
+		route_information[route["tag"]] = current_route_info
 	
 # The start and end stops need to be serviced by the same route/direction
 def get_possible_routes_and_directions(start_title, end_title):
@@ -64,14 +63,11 @@ def get_possible_routes_and_directions(start_title, end_title):
 	return start_set.intersection(end_set).pop()
 
 def stops_between(start_tag, end_tag, route_tag, direction_tag):
-	start_index = 0
-	end_index = 0
 	num_stops = len(route_information[route_tag]["direction"][direction_tag])
 
 	start_index = route_information[route_tag]["direction"][direction_tag][start_tag]
 	end_index = route_information[route_tag]["direction"][direction_tag][end_tag]
 
-	print (start_index, end_index)
 	if start_index <= end_index:
 		return end_index - start_index
 	else:
@@ -84,6 +80,3 @@ def stop_title_to_stop_tag_for_route(stop_title, route_tag):
 
 construct_route_information()
 construct_shared_stops()
-print stops_between("mcm8th","fitten", "red", "Clockwise" )
-
-pprint.pprint(route_information)
