@@ -60,8 +60,8 @@ def start_api():
 	#the page has passed both a start and end point
 	start_tag = request.args['start']
 	end_tag = request.args['end']
-	start_title = stop_tag_to_stop_title(start_tag)
-	end_title = stop_tag_to_stop_title(end_tag)
+	start_title = stop_key_tag_value_title[start_tag]
+	end_title = stop_key_tag_value_title[end_tag]
 
 	(route_tag, direction_tag) = getRoute(start_title, end_title)
 

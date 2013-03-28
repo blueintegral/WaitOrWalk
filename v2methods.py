@@ -2,14 +2,14 @@ import json
 import pprint
 import urllib2
 
-output_json = json.load(open('data/routeconfig.txt'))
+data_json = json.load(open('data/routeconfig.txt'))
 
 ''' 
 Process for looking up the times for walking and bus.
 	Get start and stop location which are stop tags
 	Convert those to stop titles
 	Find the routes that service both stop titles
-	Convert the stop titles back to the stop tags for the route chosen
+	Get the corresponding stop titles from the stop tags for the route chosen
 	Call the next bus api with the stop tags
 	Call own api with the stop tags
 '''
@@ -17,85 +17,73 @@ Process for looking up the times for walking and bus.
 # Used to find all the routes/directions that share a certain stop
 # key: stop_title, value: (route_tag, direction_tag, stop_tag).
 shared_stops = dict()
+route_information = dict()
+stop_key_tag_value_title = dict()
+stop_key_route_and_title_value_tag = dict()
 
-# Gets the stop title from the stops
-def get_stop_details(stop_tag, stops):
-	for stop in stops:
-		if stop["tag"] == stop_tag:
-			return stop["title"]
-
-# (route, direction, stop)
 def construct_shared_stops():
-	for i in output_json["route"]:
-		for j in i["direction"]:
-			for k in j["stop"]:
-				key = get_stop_details(k["tag"], i["stop"]) # stop_title
-				value = (i["tag"], j["tag"], k["tag"]) # (R,D,S)
+	for route in data_json["route"]:
+		for direction in route["direction"]:
+			for stop in direction["stop"]:
+				key = stop_key_tag_value_title[stop["tag"]]
+				value = (route["tag"], direction["tag"], stop["tag"])  # (R,D,S)
 				if key in shared_stops:
 					shared_stops[key].append(value)
 				else:
 					shared_stops[key] = [value]
-				
+
+def construct_route_information():
+	for route in data_json["route"]:
+		r_info = dict()
+		direction_dict = dict()
+		
+		for stop in route["stop"]:
+			stop_key_tag_value_title[stop["tag"]] = stop["title"]
+			stop_key_route_and_title_value_tag[(route["tag"], stop["title"])] = stop["tag"]
+		
+		for direction in route["direction"]:
+			current_direction = dict()
+			for stop_index in range(len(direction["stop"])):
+				current_stop = direction["stop"][stop_index]
+				current_direction[current_stop["tag"]] = stop_index
+			direction_dict[direction["tag"]] = current_direction
+		r_info["direction"] = direction_dict
+		route_information[route["tag"]] = r_info
+	
 # The start and end stops need to be serviced by the same route/direction
 def get_possible_routes_and_directions(start_title, end_title):
 	start_set = set()
-	stop_set = set()
+	end_set = set()
 
-	for (r,d,s) in shared_stops[start_title]:
-		start_set.add((r,d))
+	for (r, d, s) in shared_stops[start_title]:
+		start_set.add((r, d))
 
-	for (r,d,s) in shared_stops[end_title]:
-		stop_set.add((r,d))
-	return start_set.intersection(stop_set).pop()
+	for (r, d, s) in shared_stops[end_title]:
+		end_set.add((r, d))
+	# Returns one of possible choices	
+	return start_set.intersection(end_set).pop()
 
-def stops_between(start, end, route, direction):
+def stops_between(start_tag, end_tag, route_tag, direction_tag):
 	start_index = 0
 	end_index = 0
-	num_stops = 0
-	for r in output_json["route"]:
-		if r["tag"] == route:
-			for d in r["direction"]:
-				if d["tag"] == direction:
-					num_stops = len(d["stop"])
-					for stop_index in range(len(d["stop"])):
-						if start == d["stop"][stop_index]["tag"]:
-							start_index = stop_index
-						if end == d["stop"][stop_index]["tag"]:
-							end_index = stop_index
+	num_stops = len(route_information[route_tag]["direction"][direction_tag])
+
+	start_index = route_information[route_tag]["direction"][direction_tag][start_tag]
+	end_index = route_information[route_tag]["direction"][direction_tag][end_tag]
+
+	print (start_index, end_index)
 	if start_index <= end_index:
 		return end_index - start_index
 	else:
 		return end_index + (num_stops - start_index)
-	# print(start_index, end_index)
 
-def get_NextBus_time_unused(stop, direction, route):
-	print (route, direction, stop)
-	response_json = json.load(urllib2.urlopen('http://desolate-escarpment-6039.herokuapp.com/bus/get?route='+route+'&direction='+direction+'&stop='+stop))
-	print ""
-
-	print response_json
-	print ""
-	if len(response_json["predictions"]) == 0:
-		return 1000
-	else:
-		return int(response_json["predictions"][0])
-
-def stop_tag_to_stop_title(stop_tag):
-	for stop_title in shared_stops:
-		for stop in shared_stops[stop_title]:
-			if stop_tag == stop[2]:
-				return stop_title
-
+# Since shared_stops groups by stop_titles, iterate through them to find the stop_tag
+# in (route_tag, direction_tag, stop_tag)
 def stop_title_to_stop_tag_for_route(stop_title, route_tag):
-	for stop_tuple in shared_stops[stop_title]:
-		if stop_tuple[0] == route_tag:
-			return stop_tuple[2]
+	return stop_key_tile_value_tag[route_tag][stop_title]
 
+construct_route_information()
 construct_shared_stops()
-# print stop_tag_to_stop_title("fitten_a")
-# print(shared_stops["Fitten Hall"])
+print stops_between("mcm8th","fitten", "red", "Clockwise" )
 
-# print stop_title_to_stop_tag_for_route("Fitten Hall", "blue")
-# print get_possible_routes_and_directions("Transit Hub", "Klaus Building")
-# stops_between("hubfers", "5thfowl", "red", "Clockwise" )
-# print(get_NextBus_time("red", "Clockwise", "fitten"))
+pprint.pprint(route_information)
