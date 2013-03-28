@@ -3,12 +3,23 @@ import json
 import urllib2
 import time
 import os
-'''This script will call Google Maps to calculate the time to walk between every combination of bus stops and the time to drive between every combination of bus stops. We can't do this live in the app because of rate limiting and because Google requires you show a map, which I don't want to do. '''
 
-#We'll have to go through each of the 17 stops with one origin and all 16 other stops as destinations. So we'll end up with fitten.json, mcm8th.json, etc. Then we can access the json for the specific starting point, find the destination, and get the travel time. Rate limiting prevents doing this in a more elegant way with fewer API calls.
+"""This script will call Google Maps to calculate the time to walk between every combination of bus stops and the time to drive between every combination of bus stops.
+
+We can't do this live in the app because of rate limiting and because Google requires you show a map.
+"""
 
 def get_times(walking):
-	"""Get the travel time either walking or driving to all the bus stops."""
+	"""Get the travel time either walking or driving to all the bus stops.
+
+	We'll have to go through each of the 17 stops with one origin and all 16 other stops as destinations. 
+
+	This will result in fitten.json, mcm8th.json, etc...
+
+	Then you can access the JSON for the specific starting point, find the destination, and get the travel time.
+
+	Rate limiting prevents doing this in a more elegant way with fewer API calls.
+	"""
 
 	index = 0
 
