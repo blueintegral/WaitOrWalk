@@ -16,33 +16,36 @@ print "This will take about 10 minutes, so sit tight."
 if not os.path.exists("data/driving"):
 	os.makedirs("data/driving")
 
-index = 0
-for i in places:
-	print "Fetching "+name[index]+" drive times..."
-	urlbase = "http://maps.googleapis.com/maps/api/distancematrix/json?origins=" + i + "&destinations=33.7782,-84.4041|33.7795,-84.4041|33.7796,-84.4029|33.7784,-84.4009|33.7782,-84.3994|33.7782,-84.3975|33.7772,-84.3956|33.7769,-84.3938|33.7797,-84.3921|33.7752,-84.392|33.774,-84.3919|33.7715,-84.3919|33.7701,-84.3917|33.7722,-84.3955|33.7728,-84.397|33.7735,-84.3991|33.7754,-84.4025&sensor=false&mode=driving" 
-	jsonresponse = json.load(urllib2.urlopen(urlbase))
-	with open("data/driving/" + name[index] + ".json", 'w') as outfile:
-		json.dump(jsonresponse, outfile)
-	index = index + 1
-	time.sleep(15) #wait for rate limit
+get_times(false)
 
 # Make the walking directory if it does not exist
 if not os.path.exists("data/walking"):
 	os.makedirs("data/walking")
 
-index = 0
-for i in places:
-	print "Fetching "+name[index]+" walk times..."
-	urlbase = "http://maps.googleapis.com/maps/api/distancematrix/json?origins=" + i + "&destinations=33.7782,-84.4041|33.7795,-84.4041|33.7796,-84.4029|33.7784,-84.4009|33.7782,-84.3994|33.7782,-84.3975|33.7772,-84.3956|33.7769,-84.3938|33.7797,-84.3921|33.7752,-84.392|33.774,-84.3919|33.7715,-84.3919|33.7701,-84.3917|33.7722,-84.3955|33.7728,-84.397|33.7735,-84.3991|33.7754,-84.4025&sensor=false&mode=walking" 
-	jsonresponse = json.load(urllib2.urlopen(urlbase))
-	with open("data/walking/ " + name[index] + ".json", 'w') as outfile:
-		json.dump(jsonresponse, outfile)
-	index = index + 1
-	time.sleep(15) #wait for rate limit
+get_times(true)
 
+def get_times(walking):
+	"""Get the travel time either walking or driving to all the bus stops."""
 
+	index = 0
 
+	mode = "walking" if walking else "driving"
 
+	for i in places:
+		print "Fetching " + name[index] + " walk times..."
+
+		url = "http://maps.googleapis.com/maps/api/distancematrix/json?origins=" + i + "&destinations=33.7782,-84.4041|33.7795,-84.4041|33.7796,-84.4029|33.7784,-84.4009|33.7782,-84.3994|33.7782,-84.3975|33.7772,-84.3956|33.7769,-84.3938|33.7797,-84.3921|33.7752,-84.392|33.774,-84.3919|33.7715,-84.3919|33.7701,-84.3917|33.7722,-84.3955|33.7728,-84.397|33.7735,-84.3991|33.7754,-84.4025&sensor=false&mode=" + mode
+
+		# Write the data to the file
+		json_response = json.load(urllib2.urlopen(url))
+
+		with open("data/" + mode + "/" + name[index] + ".json", 'w') as output_file:
+			json.dump(json_response, output_file)
+
+		index = index + 1
+
+		# Wait for rate limit
+		time.sleep(15)
 
 '''
 fitten: 33.7782, 84.4041
