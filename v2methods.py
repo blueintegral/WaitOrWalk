@@ -62,7 +62,6 @@ def get_possible_routes_and_directions(start_title, end_title):
 	# Returns one of possible choices	
 
 	possible_routes_directions = start_set.intersection(end_set)
-	print possible_routes_directions
 	new_list= list()
 	
 	# Returning the route with the least number of stops, this isn't ideal. A better solution needs to exist for
