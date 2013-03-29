@@ -64,7 +64,7 @@ def start_api():
 	start_title = stop_key_tag_value_title[start_tag]
 	end_title = stop_key_tag_value_title[end_tag]
 
-	(route_tag, direction_tag) = get_route(start_title, end_title)
+	(route_tag, direction_tag) = get_route_and_direction(start_title, end_title)
 
 	start_tag = stop_key_route_and_title_value_tag[(route_tag, start_title)]
 	end_tag = stop_key_route_and_title_value_tag[(route_tag, end_title)]
@@ -75,9 +75,6 @@ def start_api():
 	result = should_wait(start_tag, end_tag, route_tag, direction_tag)
 	wait_time = get_nextbus_time(start_tag, direction_tag, route_tag)
 	return  ' '.join([str(result), str(wait_time)])
-
-def get_route(start_title, end_title):
-	return get_possible_routes_and_directions(start_title, end_title)
 
 def should_wait(start_tag, end_tag, route_tag, direction_tag):
 	'''Actually makes the decision to wait or walk '''
@@ -98,12 +95,9 @@ def should_wait(start_tag, end_tag, route_tag, direction_tag):
 
 
 def get_nextbus_time(stop, direction, route):
-	'''Returns next arrival time for given route and starting point scraped from NextBus.
-	'''
-	# Need to fake a user agent or else nextbus will reject the connection
-			
+	'''Returns next arrival time for given route and starting point scraped from NextBus. '''
 	request = urllib2.Request("http://www.nextbus.com/predictor/simplePrediction.shtml?a=georgia-tech&r="+route+"&d="+ direction +"&s="+stop)
-	request.add_header('User-agent','Mozilla/5.0')
+	request.add_header('User-agent','Mozilla/5.0') # Need to fake a user agent or else nextbus will reject the connection
 
 	result = urllib2.urlopen(request)
 	response = result.read()
@@ -138,7 +132,7 @@ def get_time(start, end, method):
 	#	Needs to be fixed when walking data has all stops information
 	
 	if not os.path.isfile("data/"+method+"/"+start+".json"):
-		print "ERROR ERROR ERROR"
+		print "ERROR STARTING STOP DOESN'T EXIST ERROR"
 		return	1000
 
 	# Get distance matrix for this trip
@@ -184,12 +178,11 @@ def get_time(start, end, method):
 
 	# Needs to be fixed when walking data has all stops information
 	if isinstance(end, str) or isinstance(end, unicode):
-		print "ERROR ERROR ABORTING"
+		print "ERROR ENDING STOP DOESN'T EXIST ERROR"
 		return	1000	
 		
 	expected_time = parsed_json["rows"][0]["elements"][end]["duration"]["value"]
 	expected_time = int(expected_time) / 60 # Convert to minutes
-	
 	return expected_time
 
 if __name__ == '__main__':

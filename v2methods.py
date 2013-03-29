@@ -50,7 +50,7 @@ def construct_route_information():
 		route_information[route["tag"]] = current_route_info
 	
 # The start and end stops need to be serviced by the same route/direction
-def get_possible_routes_and_directions(start_title, end_title):
+def get_route_and_direction(start_title, end_title):
 	start_set = set()
 	end_set = set()
 
@@ -59,8 +59,9 @@ def get_possible_routes_and_directions(start_title, end_title):
 
 	for (r, d, s) in shared_stops[end_title]:
 		end_set.add((r, d))
-	# Returns one of possible choices	
+	
 
+	# Returns one of possible choices	
 	possible_routes_directions = start_set.intersection(end_set)
 	new_list= list()
 	
