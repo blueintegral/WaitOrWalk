@@ -22,73 +22,68 @@
 	</div>
 
 	<div class="container">
-	</div>
-
-	<div data-role="page" data-theme="a">
-		<div data-role="header" data-position="inline">
-			<center><h1>Should I wait or walk?</h1></center>
+		<div class="row text-center" id="setup">
+			<div class="span12">
+				<h2 id="originText">Where are you?</h2>
+				<h2 id="destinationText">Where are you going?</h2>
+			</div>
 		</div>
 
-		<div data-role="content" data-theme="a">
-			<center><h2 class="start">Where are you?</h2><h2 class="end">Where are you going?</h2></h2></center>
+		<div id="results">
+			<div class="row text-center" id="wait">
+				<div class="span12">
+					<h2>You should wait.</h2>
+					<h3>It'll be quicker to wait for the bus instead of walking.</h3>
+				</div>
+			</div>
 
-			<center><h1 class="wait">You should wait.</h1><h1 class="walk">You should walk.</h1></center>
-			<center>
-				<h3 class="wait">It'll be quicker to wait for the bus instead of walking.</h3>
+			<div class="row text-center" id="walk">
+				<div class="span12">
+					<h2>You should walk.</h2>
+					<h3>It'll be quicker to walk instead of waiting for the bus.</h3>
+				</div>
+			</div>
 
-				<h3 class="walk">It'll be quicker to walk instead of waiting for the bus.</h3>
-				<h3>
-					<div class="rainy">
-						It looks rainy though, so if you can hang around for <div class="rainytext"></div>
-					</div>
-				</h3>
-				<h3>
-					<div class="cold">
-						It's pretty cold though, so if you can hang around for <div class="coldtext"></div>
-					</div>
-					<br />
-					<a href="javascript:location.reload(true);" class="again" data-role="button" data-theme="b">Do it again</a></h3>
-				<h3 class="thinking">Hang on...</h3>
-			</center>
+			<div class="row text-center" id="weather">
+				<div class="span12">
+					<h3>It looks rainy though, so if you can hang around for <span id="time"></span> minutes.</h3>
+					<h3>It looks colds though, so if you can hang around for <span id="time"></span> minutes.</h3>
+				</div>
+			</div>
 
-			<a href="#" class="start" id="fitten" data-role="button" data-theme="b">Fitten</a>
-			<a href="#" class="start" id="mcm8th" data-role="button" data-theme="b">McMillian & 8th</a>
-			<a href="#" class="start" id="8thhemp" data-role="button" data-theme="b">8th & Hemphill</a>
-			<a href="#" class="start" id="fershemrt" data-role="button" data-theme="b">Ferst & Hemphill</a>
-			<a href="#" class="start" id="fersstmrt" data-role="button" data-theme="b">Ferst & State</a>
-			<a href="#" class="start" id="fersatmrt" data-role="button" data-theme="b">Ferst & Atlantic</a>
-			<a href="#" class="start" id="ferschmrt" data-role="button" data-theme="b">Klaus</a>
-			<a href="#" class="start" id="5thfowl" data-role="button" data-theme="b">Ferst & Fowler</a>
-			<a href="#" class="start" id="tech5th" data-role="button" data-theme="b">Techwood & 5th</a>
-			<a href="#" class="start" id="tech4th" data-role="button" data-theme="b">Techwood & 4th</a>
-			<a href="#" class="start" id="techbob" data-role="button" data-theme="b">Techwood & Bobby Dodd</a>
-			<a href="#" class="start" id="technorth" data-role="button" data-theme="b">Techwood & North Ave</a>
-			<a href="#" class="start" id="nortavea_a" data-role="button" data-theme="b">North Ave Apartments</a>
-			<a href="#" class="start" id="ferstcher" data-role="button" data-theme="b">Tech Tower</a>
-			<a href="#" class="start" id="hubfers" data-role="button" data-theme="b">Hub/Ferst</a>
-			<a href="#" class="start" id="centrstud" data-role="button" data-theme="b">Student Center</a>
-			<a href="#" class="start" id="765femrt" data-role="button" data-theme="b">CRC</a>
-
-			<a href="#" class="end" id="fitten" data-role="button" data-theme="c">Fitten</a>
-			<a href="#" class="end" id="mcm8th" data-role="button" data-theme="c">McMillian & 8th</a>
-			<a href="#" class="end" id="8thhemp" data-role="button" data-theme="c">8th & Hemphill</a>
-			<a href="#" class="end" id="fershemrt" data-role="button" data-theme="c">Ferst & Hemphill</a>
-			<a href="#" class="end" id="fersstmrt" data-role="button" data-theme="c">Ferst & State</a>
-			<a href="#" class="end" id="fersatmrt" data-role="button" data-theme="c">Ferst & Atlantic</a>
-			<a href="#" class="end" id="ferschmrt" data-role="button" data-theme="c">Klaus</a>
-			<a href="#" class="end" id="5thfowl" data-role="button" data-theme="c">Ferst & Fowler</a>
-			<a href="#" class="end" id="tech5th" data-role="button" data-theme="c">Techwood & 5th</a>
-			<a href="#" class="end" id="tech4th" data-role="button" data-theme="c">Techwood & 4th</a>
-			<a href="#" class="end" id="techbob" data-role="button" data-theme="c">Techwood & Bobby Dodd</a>
-			<a href="#" class="end" id="technorth" data-role="button" data-theme="c">Techwood & North Ave</a>
-			<a href="#" class="end" id="nortavea_a" data-role="button" data-theme="c">North Ave Apartments</a>
-			<a href="#" class="end" id="ferstcher" data-role="button" data-theme="c">Tech Tower</a>
-			<a href="#" class="end" id="hubfers" data-role="button" data-theme="c">Hub/Ferst</a>
-			<a href="#" class="end" id="centrstud" data-role="button" data-theme="c">Student Center</a>
-			<a href="#" class="end" id="765femrt" data-role="button" data-theme="c">CRC</a>
-
-			<center><br /><br />Cooked up by <a href="http://hscott.net">Hunter Scott</a>.</center>
+			<div class="row text-center" id="again">
+				<div class="span12">
+					<button class="btn btn-primary btn-large">Do it again.</button>
+				</div>
+			</div>
 		</div>
+
+		<div class="row">
+			<div class="span12">
+				<button class="btn btn-primary btn-block btn-large" data-id="fitten">Fitten</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="mcm8th">McMillian &amp; 8th</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="8thhemp">8th &amp; Hemphill</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="fershemrt">Ferst &amp; Hemphill</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="fersstmrt">Ferst &amp; State</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="fersatmrt">Ferst &amp; Atlantic</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="ferschmrt">Klaus</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="5thfowl">Ferst &amp; Fowler</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="tech5th">Techwood &amp; 5th</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="tech4th">Techwood &amp; 4th</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="techbob">Techwood &amp; Bobby Dodd</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="technorth">Techwood &amp; North Ave</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="nortavea_a">North Ave Apartments</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="ferstcher">Tech Tower</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="hubfers">Hub/Ferst</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="centrstud">Student Center</button>
+				<button class="btn btn-primary btn-block btn-large" data-id="765femrt">CRC</button>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="span12 text-center">
+				<p>Cooked up by <a href="http://hscott.net">Hunter Scott</a>.</p>
+			</div>
 	</div>
 </body>
 </html>

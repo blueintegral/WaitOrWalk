@@ -1,3 +1,7 @@
+.navbar {
+	margin-bottom: 0;
+}
+
 .navbar-inner h3 {
 	color: #fff;
 }
