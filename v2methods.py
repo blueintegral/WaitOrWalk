@@ -3,22 +3,25 @@ import pprint
 import urllib2
 
 data_json = json.load(open('data/routeconfig.txt'))
+
 ''' 
-Process for looking up the times for walking and bus.
-	Get start and stop location which are stop tags
+Process for looking up the times for walking and bus:
+	Get start and stop locations from get request which are stop tags
 	Convert those to stop titles
 	Find the routes that service both stop titles
 	Get the corresponding stop titles from the stop tags for the route chosen
-	Call the next bus api with the stop tags
-	Call own api with the stop tags
+	Call the NextBus API with the stop tags
 	Call own API with the stop tags
 '''
 
 # Used to find all the routes/directions that share a certain stop
 # key: stop_title, value: (route_tag, direction_tag, stop_tag).
 shared_stops = dict()
+# key: route tag, value: {"direction": {"direction_tag": {"stop_tag": stop_index}}}
 route_information = dict()
+# key: stop tag, value: stop title
 stop_key_tag_value_title = dict()
+# key: (route,stop title), value: stop tag
 stop_key_route_and_title_value_tag = dict()
 
 def construct_shared_stops():
@@ -26,7 +29,7 @@ def construct_shared_stops():
 		for direction in route["direction"]:
 			for stop in direction["stop"]:
 				key = stop_key_tag_value_title[stop["tag"]]
-				value = (route["tag"], direction["tag"], stop["tag"])  # (R,D,S)
+				value = (route["tag"], direction["tag"], stop["tag"])  # (Route,Direction,Stop)
 				if key in shared_stops:
 					shared_stops[key].append(value)
 				else:
@@ -50,7 +53,7 @@ def construct_route_information():
 		current_route_info["direction"] = direction_all_dict
 		route_information[route["tag"]] = current_route_info
 	
-# The start and end stops need to be serviced by the same route/direction
+# Checks which routes/directions service the start/end stops titles
 def get_route_and_direction(start_title, end_title):
 	start_set = set()
 	end_set = set()
@@ -60,7 +63,6 @@ def get_route_and_direction(start_title, end_title):
 
 	for (r, d, s) in shared_stops[end_title]:
 		end_set.add((r, d))
-	
 
 	# Returns one of possible choices	
 	possible_routes_directions = start_set.intersection(end_set)
@@ -75,7 +77,6 @@ def get_route_and_direction(start_title, end_title):
 
 	return (r,d)
 
-
 def stops_between(start_tag, end_tag, route_tag, direction_tag):
 	num_stops = len(route_information[route_tag]["direction"][direction_tag])
 
@@ -85,10 +86,10 @@ def stops_between(start_tag, end_tag, route_tag, direction_tag):
 	if start_index <= end_index:
 		return end_index - start_index
 	else:
+		# For when the start index occurs after end index. 
+		# So need to count start -> number of stops, and then how many stops are in end_index
 		return end_index + (num_stops - start_index)
 
-# Since shared_stops groups by stop_titles, iterate through them to find the stop_tag
-# in (route_tag, direction_tag, stop_tag)
 # Doesn't really need to be a function
 def stop_title_to_stop_tag_for_route(stop_title, route_tag):
 	return stop_key_route_and_title_value_tag[(route_tag,stop_title)]
