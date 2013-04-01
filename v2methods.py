@@ -11,6 +11,7 @@ Process for looking up the times for walking and bus.
 	Get the corresponding stop titles from the stop tags for the route chosen
 	Call the next bus api with the stop tags
 	Call own api with the stop tags
+	Call own API with the stop tags
 '''
 
 # Used to find all the routes/directions that share a certain stop

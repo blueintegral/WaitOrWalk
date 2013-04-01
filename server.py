@@ -14,6 +14,9 @@ app = Flask(__name__)
 last_weather_download_time = time.time()
 cold = False
 rain = False
+# Constants
+DEFAULT_MAX_TIME = 1000
+COLD_BELOW_TEMP = 60
 
 
 @app.route('/')
@@ -39,7 +42,7 @@ def weather():
 
 		temperature = parsed_json['current_observation']['temp_f']
 
-		if temperature < 60:
+		if temperature < COLD_BELOW_TEMP:
 			cold = True # It's cold
 
 		conditions = parsed_json['current_observation']['weather']
@@ -69,7 +72,6 @@ def start_api():
 	start_tag = stop_key_route_and_title_value_tag[(route_tag, start_title)]
 	end_tag = stop_key_route_and_title_value_tag[(route_tag, end_title)]
 
-
 	# print (start_tag, end_tag, route_tag)
 
 	result = should_wait(start_tag, end_tag, route_tag, direction_tag)
@@ -87,6 +89,7 @@ def should_wait(start_tag, end_tag, route_tag, direction_tag):
 	wait_time = wait_time + drive_time +  0.25*stops #that's .25 minutes
 	#Get walk time
 	walk_time = get_time(start_tag, end_tag, "walking")
+	
 	#compare two times
 	if(wait_time < walk_time):
 		return 1
@@ -108,11 +111,11 @@ def get_nextbus_time(stop, direction, route):
 
 	if not soup:
 		available = False
-		result = 10000
+		result = DEFAULT_MAX_TIME
 
 	if soup.findAll(text='No prediction') != []:
 		available = False
-		result = 10000
+		result = DEFAULT_MAX_TIME
 
 	if available:
 		prediction = soup.find('td', {'class':"predictionNumberForFirstPred"})
@@ -123,7 +126,7 @@ def get_nextbus_time(stop, direction, route):
 			if result == "Arriving":
 				result = 0
 		else:
-			result = 10000
+			result = DEFAULT_MAX_TIME
 
 	return int(result)
 
@@ -133,10 +136,9 @@ def get_time(start, end, method):
 	
 	if not os.path.isfile("data/"+method+"/"+start+".json"):
 		print "ERROR STARTING STOP DOESN'T EXIST ERROR"
-		return	1000
+		return	DEFAULT_MAX_TIME
 
 	# Get distance matrix for this trip
-	
 	raw_json = open("data/" + method + "/" + start + ".json").read()
 	parsed_json = json.loads(raw_json)
 
@@ -179,7 +181,7 @@ def get_time(start, end, method):
 	# Needs to be fixed when walking data has all stops information
 	if isinstance(end, str) or isinstance(end, unicode):
 		print "ERROR ENDING STOP DOESN'T EXIST ERROR"
-		return	1000	
+		return	DEFAULT_MAX_TIME	
 		
 	expected_time = parsed_json["rows"][0]["elements"][end]["duration"]["value"]
 	expected_time = int(expected_time) / 60 # Convert to minutes
