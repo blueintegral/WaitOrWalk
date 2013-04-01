@@ -15,14 +15,12 @@ last_weather_download_time = time.time()
 cold = False
 rain = False
 
+route_list_json = open('data/routeconfig.txt')
+route_list = json.load(route_list_json)
 
 @app.route('/')
 def index():
 	return render_template('index.html')
-
-@app.route('/how')
-def how():
-	return render_template('how.html')
 
 @app.route('/weather')
 def weather():
@@ -61,6 +59,12 @@ def start_api():
 	#the page has passed both a start and end point
 	start_tag = request.args['start']
 	end_tag = request.args['end']
+	#Sanitize input
+	if (not (any (start_tag in s["tag"] for s in route_list["route"][0]["stop"]))):
+		return
+	if (not (any (end_tag in s["tag"] for s in route_list["route"][0]["stop"]))):
+		return
+	 
 	start_title = stop_key_tag_value_title[start_tag]
 	end_title = stop_key_tag_value_title[end_tag]
 
