@@ -14,6 +14,8 @@ $(document).ready(function() {
 
 			$("#originText").addClass("hide");
 			$("#destinationText").removeClass("hide");
+
+			$("#stops button").addClass("btn-danger");
 		} else {
 			destination_stop = $(this).data("id");
 
@@ -65,6 +67,8 @@ function reset() {
 
 	$("#setup").removeClass("hide");
 	$("#stops").removeClass("hide");
+
+	$("#stops button").removeClass("btn-danger");
 
 	pick_origin = true;
 }
