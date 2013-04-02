@@ -1,13 +1,11 @@
+body {
+	padding-top: 60px;
+}
+
 .navbar {
 	margin-bottom: 0;
 }
 
 .navbar-inner h3 {
 	color: #fff;
-}
-
-.navbar-unrounded .navbar-inner {
-	-webkit-border-radius: 0;
-	-moz-border-radius: 0;
-	border-radius: 0;
 }
