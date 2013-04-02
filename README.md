@@ -23,4 +23,5 @@ Next on my list is the Trolley. There are some less than elegant parts of this c
 
 Credits
 -------
-* jQuery Mobile Bootstrap theme by Andy Matthews
+* [Bootstrap](http://twitter.github.com/bootstrap/)
+* [jQuery](http://jquery.com/)
