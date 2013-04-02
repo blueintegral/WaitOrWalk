@@ -1,109 +1,134 @@
-var start_g;
-var end_g;
+var origin_stop;
+var destination_stop;
 
-$(function() {
-	$('<a name="top"/>').insertBefore($('body').children().eq(0));
-	window.location.hash = 'top';
-});
+var pick_origin;
 
 $(document).ready(function() {
-	$(".end").hide();
-	$(".wait").hide();
-	$(".walk").hide();
-	$(".thinking").hide();
-	$(".rainy").hide();
-	$(".cold").hide();
-	$(".again").hide();
-	$(".rainytext").hide();
-	$(".coldtext").hide();
+	pick_origin = true;
 
-	$(".start").click(function() {
-		start_g = this.id;
+	$("#stops button").click(function() {
+		if (pick_origin) {
+			origin_stop = $(this).data("id");
 
-		$(".start").hide();
-		$(".end").show();
+			pick_origin = false;
 
-		$(function() {
-				 $('body').scrollTop(0);
-			 });
-	}); 
+			$("#originText").addClass("hide");
+			$("#destinationText").removeClass("hide");
+		} else {
+			destination_stop = $(this).data("id");
 
-	$(".end").click(function(){
-		end_g = this.id;
-		$(".end").hide();
-		$(".thinking").show();
-		//Figure out if they should walk or wait.
-		
-		//Do a GET request to /shouldwait?start=startingLocation&end=endingLocation
-		//it will return a 1 if you should wait and a 0 if you should walk
-		$.get("/shouldwait", {"start" : start_g, "end" : end_g}, function(result) {
-			//console.log(result);
-			//Check weather, but only if the buses are operating (M-F, 7am-10pm)
-			shouldwait = result.slice(0,1); 
-			waittime = result.slice(2,4);
+			$("#setup").addClass("hide");
 
-			var weather = 0;
-			var currentdate = new Date();
+			$("#originText").removeClass("hide");
+			$("#destinationText").addClass("hide");
 
-			if ((currentdate.getDay() != 0) && (currentdate.getDay() != 6)) {
-				//it's a weekday
-				if ((currentdate.getHours() > 7) && (currentdate.getHours() < 22)) {
-					//it's between 7am and 10pm
-					var request = new XMLHttpRequest(); //jQuery? We don't need no stinkin' jQuery!
-					request.open("GET", "/weather", false);
-					request.send(null);
+			$("#stops").addClass("hide");
 
-					weather = request.responseText;
-					//console.log(weather);
-				}
-			}
+			$("#thinking").removeClass("hide");
 
-			if (shouldwait == 0) {
-				//walk
-				$(".walk").show();
-				$(".again").show();
+			determineWaitOrWalk(origin_stop, destination_stop,
+				function(should_wait, wait_time, weather) {
+					// Success
+					$("#thinking").addClass("hide");
 
-				if (weather == 1) {
-					//it's rainy
-					$(".rainy").show();
-
-					var phrase;
-
-					if (waittime == 1) {
-						phrase = waittime.toString() + " minute, you can ride the bus and stay dry."
+					if (should_wait) {
+						shouldWait();
 					} else {
-						phrase = waittime.toString() + " minutes, you can ride the bus and stay dry."
+						shouldWalk();
 					}
 
-					$(".rainytext").append(phrase);
-					$(".rainytext").show();
-				}
+					$("#again").removeClass("hide");
+					
+					$("#results").removeClass("hide");
+				}, function() {
+					// Failure
+					reset();
+			});
+		}
+	});
 
-				if (weather == 2) {
-					//it's cold
-					$(".cold").show();
-
-					var phrase;
-
-					if (waittime == 1) {
-						phrase = waittime.toString() + " minute, you can ride the bus and stay warm."
-					} else {
-						phrase = waittime.toString() + " minutes, you can ride the bus and stay warm."
-					}
-
-					$(".coldtext").append(phrase);
-					$(".coldtext").show();
-				}
-
-				$(".thinking").hide();
-			} else if (shouldwait == 1) {
-				//wait
-				$(".wait").show();
-				$(".again").show();
-				$(".thinking").hide();
-			} else {
-				console.log("Error: Got unexpected result from server");
-			}
-		});
+	$("#again button").click(function() {
+		reset();
 	});
 });
+
+function reset() {
+	$("#rain").addClass("hide");
+	$("#cold").addClass("hide");
+
+	$("#wait").addClass("hide");
+	$("#walk").addClass("hide");
+
+	$("#thinking").addClass("hide");
+	$("#results").addClass("hide");
+	$("#again").addClass("hide");
+
+	$("#setup").removeClass("hide");
+	$("#stops").removeClass("hide");
+
+	pick_origin = true;
+}
+
+function shouldWalk(wait_time, weather) {
+	$("#walk").removeClass("hide");
+
+	if (weather == 1) {
+		// It is raining
+		
+		$("#rain").removeClass("hide");
+		$("#rain #time").text(wait_time);
+	} else if (weather == 2) {
+		// It is cold
+		
+		$("#cold").removeClass("hide");
+		$("#cold #time").text(wait_time);
+	}
+}
+
+function shouldWait() {
+	$("#wait").removeClass("hide");
+}
+
+function determineWaitOrWalk(origin, destination, success, failure) {
+	var data = { "start": origin, "end": destination };
+
+	$.ajax({
+			url: "/shouldwait",
+			data: data
+	}).done(function(result) {
+		var should_wait = result.slice(0, 1) == 1 ? true : false;
+		var wait_time = result.slice(2, 4);
+		var weather;
+
+		getWeather(function(result) {
+			return success(should_wait, wait_time, result);
+		}, function() {
+			console.error("Could not get weather.");
+
+			return success(should_wait, wait_time, 0);
+		});
+	}).fail(function() {
+		console.error("Could not determine whether to wait or walk.");
+
+		return failure();
+	});
+}
+
+function getWeather(success, failure) {
+	var now = new Date();
+
+	// Only check weather if buses are operating
+	// Buses operate M-F from 7 AM to 10 PM
+	if (now.getDay() >= 1 && now.getDay() <= 5) {
+		if (now.getHours() > 7 && now.getHours() < 22) {
+			// Buses are operating
+			$.ajax({
+				url: "/weather"
+			}).done(function(result) {
+				return success(result);
+			}).fail(function() {
+				return failure();
+			});
+		}
+	}
+}
