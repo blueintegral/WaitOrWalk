@@ -6,7 +6,7 @@ var pick_origin;
 $(document).ready(function() {
 	pick_origin = true;
 
-	$("#stops button").click(function() {
+	$("#stops a").click(function() {
 		if (pick_origin) {
 			origin_stop = $(this).data("id");
 
@@ -15,7 +15,7 @@ $(document).ready(function() {
 			$("#originText").addClass("hide");
 			$("#destinationText").removeClass("hide");
 
-			$("#stops button").addClass("btn-danger");
+			$("#stops a").addClass("btn-danger");
 		} else {
 			destination_stop = $(this).data("id");
 
@@ -49,7 +49,7 @@ $(document).ready(function() {
 		}
 	});
 
-	$("#again button").click(function() {
+	$("#again a").click(function() {
 		reset();
 	});
 });
@@ -68,7 +68,7 @@ function reset() {
 	$("#setup").removeClass("hide");
 	$("#stops").removeClass("hide");
 
-	$("#stops button").removeClass("btn-danger");
+	$("#stops a").removeClass("btn-danger");
 
 	pick_origin = true;
 }
