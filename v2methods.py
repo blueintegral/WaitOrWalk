@@ -18,7 +18,7 @@ Process for looking up the times for walking and bus:
 # Used to find all the routes/directions that share a certain stop
 # key: stop_title, value: (route_tag, direction_tag, stop_tag).
 shared_stops = dict()
-# key: route tag, value: {"direction": {"direction_tag": {"stop_tag": stop_index}}}
+# key: route tag, value: {"direction": {direction_tag: {stop_tag: stop_index}}}
 route_information = dict()
 # key: stop tag, value: stop title
 stop_key_tag_value_title = dict()
@@ -54,18 +54,19 @@ def construct_route_information():
 		current_route_info["direction"] = direction_all_dict
 		route_information[route["tag"]] = current_route_info
 	
-# Checks which routes/directions service the start/end stops titles
 def get_route_and_direction(start_title, end_title):
+	# Get all of the (route, direction, stop)'s that service start/end stop titles
 	start_set = set([(r , d) for (r, d, _) in shared_stops[start_title]])
 	end_set = set([(r , d) for (r, d, _) in shared_stops[end_title]])
 
-	possible_routes_directions = start_set.intersection(end_set)
+	# Now get the intersection of the two sets to figure out which service both
+	possible_routes_directions_set = start_set.intersection(end_set)
 	
 	# Returning the route with the least number of stops, this isn't ideal. A better solution needs to exist for
 	# when two routes service the start/end locations
-	new_list= list()
+	new_list = list()
 
-	for (r, d) in possible_routes_directions:
+	for (r, d) in possible_routes_directions_set:
 		start_tag = stop_title_to_stop_tag_for_route(start_title, r)
 		end_tag = stop_title_to_stop_tag_for_route(end_title, r)
 
@@ -77,10 +78,10 @@ def get_route_and_direction(start_title, end_title):
 	return (r,d)
 
 def stops_between(start_tag, end_tag, route_tag, direction_tag):
-	num_stops = len(route_information[route_tag]["direction"][direction_tag])
-
 	start_index = route_information[route_tag]["direction"][direction_tag][start_tag]
 	end_index = route_information[route_tag]["direction"][direction_tag][end_tag]
+
+	num_stops = len(route_information[route_tag]["direction"][direction_tag])
 
 	if start_index <= end_index:
 		return end_index - start_index
@@ -91,7 +92,7 @@ def stops_between(start_tag, end_tag, route_tag, direction_tag):
 
 # Doesn't really need to be a function, but is cleaner than alternative of using the dict directly
 def stop_title_to_stop_tag_for_route(stop_title, route_tag):
-	return stop_key_route_and_title_value_tag[(route_tag,stop_title)]
+	return stop_key_route_and_title_value_tag[(route_tag, stop_title)]
 
 construct_route_information()
 construct_shared_stops()
