@@ -55,7 +55,7 @@ def format_coordinates(bus_stops):
 		gps_list.append(gps)
 	return "|".join(gps_list)
 
-def get_times(walking):
+def get_times(mode):
 	"""Get the travel time either walking or driving to all the bus stops.
 	We'll have to go through each of the N stops with one origin and all N-1 other stops as destinations. 
 	This will result in fitten.json, mcm8th.json, etc...
@@ -63,9 +63,10 @@ def get_times(walking):
 	Rate limiting prevents doing this in a more elegant way with fewer API calls.
 	"""
 
-	index = 0
-	mode = "walking" if walking else "driving"
+	# Mode is either walking or driving
 
+	index = 0
+	
 	for bus_stop in bus_stops:
 		print "Fetching " + bus_stop[0] + " walk times..."
 		
@@ -97,11 +98,11 @@ if __name__ == '__main__':
 		os.makedirs("data/driving")
 
 	# Get the times to drive to all the bus stops
-	# get_times(False)
+	get_times("driving")
 
 	# Make the walking directory if it does not exist
 	if not os.path.exists("data/walking"):
 		os.makedirs("data/walking")
 
 	# Get the times to walk to all the bus stops
-	# get_times(True)
+	get_times("walking")
