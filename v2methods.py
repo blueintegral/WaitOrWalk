@@ -30,7 +30,7 @@ def construct_shared_stops():
 		for direction in route["direction"]:
 			for stop in direction["stop"]:
 				key = stop_key_tag_value_title[stop["tag"]]
-				value = (route["tag"], direction["tag"], stop["tag"])  # (Route,Direction,Stop)
+				value = (route["tag"], direction["tag"], stop["tag"])  # (Route, Direction, Stop)
 				if key in shared_stops:
 					shared_stops[key].append(value)
 				else:
@@ -56,25 +56,23 @@ def construct_route_information():
 	
 # Checks which routes/directions service the start/end stops titles
 def get_route_and_direction(start_title, end_title):
-	start_set = set()
-	end_set = set()
+	start_set = set([(r , d) for (r, d, _) in shared_stops[start_title]])
+	end_set = set([(r , d) for (r, d, _) in shared_stops[end_title]])
 
-	for (r, d, s) in shared_stops[start_title]:
-		start_set.add((r, d))
-
-	for (r, d, s) in shared_stops[end_title]:
-		end_set.add((r, d))
-
-	# Returns one of possible choices	
 	possible_routes_directions = start_set.intersection(end_set)
-	new_list= list()
 	
 	# Returning the route with the least number of stops, this isn't ideal. A better solution needs to exist for
 	# when two routes service the start/end locations
+	new_list= list()
+
 	for (r, d) in possible_routes_directions:
-		num_stops = stops_between(stop_title_to_stop_tag_for_route(start_title, r), stop_title_to_stop_tag_for_route(end_title, r), r, d)
+		start_tag = stop_title_to_stop_tag_for_route(start_title, r)
+		end_tag = stop_title_to_stop_tag_for_route(end_title, r)
+
+		num_stops = stops_between(start_tag, end_tag, r, d)
 		new_list.append((num_stops, r, d))
-	(num_stops, r, d) = sorted(new_list, reverse=True).pop()
+	
+	(_, r, d) = sorted(new_list, reverse=True).pop()
 
 	return (r,d)
 
@@ -91,7 +89,7 @@ def stops_between(start_tag, end_tag, route_tag, direction_tag):
 		# So need to count start -> number of stops, and then how many stops are in end_index
 		return end_index + (num_stops - start_index)
 
-# Doesn't really need to be a function, but is cleaner than alternative of using the dict
+# Doesn't really need to be a function, but is cleaner than alternative of using the dict directly
 def stop_title_to_stop_tag_for_route(stop_title, route_tag):
 	return stop_key_route_and_title_value_tag[(route_tag,stop_title)]
 

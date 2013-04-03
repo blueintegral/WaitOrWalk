@@ -66,39 +66,35 @@ def weather():
 
 @app.route('/shouldwait')
 def start_api():
-	if not ('start' in request.args and 'end' in request.args):
-		return
-	# the page has passed both a start and end point
-	start_tag = request.args['start']
-	end_tag = request.args['end']
-	
-	# Sanitize input
-	if not (start_tag in stop_key_tag_value_title and end_tag in stop_key_tag_value_title):
-		return
-		 
-	start_title = stop_key_tag_value_title[start_tag]
-	end_title = stop_key_tag_value_title[end_tag]
+	# For sanitizing input, catches error and returns nothing.
+	try: 
+		start_tag = request.args['start']
+		end_tag = request.args['end']
 
+		start_title = stop_key_tag_value_title[start_tag]
+		end_title = stop_key_tag_value_title[end_tag]	
+	except KeyError:
+		print "Invalid input for /shouldwait"
+		return
+	
 	(route_tag, direction_tag) = get_route_and_direction(start_title, end_title)
 
 	start_tag = stop_key_route_and_title_value_tag[(route_tag, start_title)]
 	end_tag = stop_key_route_and_title_value_tag[(route_tag, end_title)]
-
-	# print (start_tag, end_tag, route_tag)
 
 	result = should_wait(start_tag, end_tag, route_tag, direction_tag)
 	wait_time = get_nextbus_time(start_tag, direction_tag, route_tag)
 	return ' '.join([str(result), str(wait_time)])
 
 def should_wait(start_tag, end_tag, route_tag, direction_tag):
-	'''Actually makes the decision to wait or walk. Returns 1 for waiting (basically wait for bus), or 0 to walk '''
-	# First get the time until next bus
+	'''Actually makes the decision to wait or walk. Returns 1 for waiting (basically wait for bus), or 0 to walk. '''
+	# First get the time to wait until next bus arrives
 	wait_time = get_nextbus_time(start_tag, direction_tag, route_tag)
 	# Now add drive time to that. This should also include amount of time spent at stops.
 	# Add an extra 15 seconds per stop made on the way
 	drive_time = get_time(start_tag, end_tag, "driving") 
 	stops = stops_between(start_tag, end_tag, route_tag, direction_tag)
-	wait_time = wait_time + drive_time +  0.25*stops # that's .25 minutes
+	wait_time = wait_time + drive_time +  0.25*stops # 0.25 minutes or 15 seconds
 	#Get walk time
 	walk_time = get_time(start_tag, end_tag, "walking")
 	
@@ -135,7 +131,7 @@ def get_nextbus_time(stop, direction, route):
 		if prediction and prediction.find('div'):
 			result = prediction.find('div').string.split(';')[1].strip()
 
-			if result == "Arriving" or result == "Departing":
+			if result in ["Arriving", "Departing"]:
 				result = 0
 		else:
 			result = DEFAULT_MAX_TIME
