@@ -97,15 +97,11 @@ def should_wait(start_tag, end_tag, route_tag, direction_tag):
 	# Now add drive time to that. This should also include amount of time spent at stops.
 	# Add an extra 15 seconds per stop made on the way
 	drive_time = get_time(start_tag, end_tag, "driving") 
-	print ("Drive time:" , drive_time)
 	stops = stops_between(start_tag, end_tag, route_tag, direction_tag)
-	print ("Stops Time",	 0.25*stops)
-	print ("Wait time", wait_time)
 	wait_time = wait_time + drive_time +  0.25*stops # that's .25 minutes
 	#Get walk time
 	walk_time = get_time(start_tag, end_tag, "walking")
 	
-	print ("Wait:", wait_time, "Walk:", walk_time)
 	#compare two times
 	if(wait_time < walk_time):
 		return 1
