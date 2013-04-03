@@ -137,8 +137,9 @@ def get_time(start, end, method):
 	#Get distance matrix for this trip
 	#	Needs to be fixed when walking data has all stops information
 
-	print((start, end))
+	# print((start, end))
 	
+	# This might not be needed anymore
 	if not os.path.isfile("data/"+method+"/"+start+".json"):
 		print "ERROR STARTING STOP DOESN'T EXIST ERROR"
 		return	DEFAULT_MAX_TIME

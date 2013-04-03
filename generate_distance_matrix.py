@@ -70,7 +70,7 @@ def get_times(walking):
 		print "Fetching " + bus_stop[0] + " walk times..."
 		
 		if os.path.isfile("data/"+mode+"/" + bus_stop[0] + ".json"):
-			print "already done"
+			print "already done" # Skipping over routes that already exist
 			continue
 
 		gps_formatted = format_GPS_coordinates(bus_stops)
