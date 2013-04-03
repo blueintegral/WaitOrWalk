@@ -91,7 +91,7 @@ def stops_between(start_tag, end_tag, route_tag, direction_tag):
 		# So need to count start -> number of stops, and then how many stops are in end_index
 		return end_index + (num_stops - start_index)
 
-# Doesn't really need to be a function
+# Doesn't really need to be a function, but is cleaner than alternative of using the dict
 def stop_title_to_stop_tag_for_route(stop_title, route_tag):
 	return stop_key_route_and_title_value_tag[(route_tag,stop_title)]
 
