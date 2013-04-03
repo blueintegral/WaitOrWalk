@@ -8,7 +8,6 @@ import ConfigParser
 from v2methods import *
 import generate_distance_matrix
 
-
 from BeautifulSoup import BeautifulSoup
 from flask import Flask, render_template, request
 
@@ -39,7 +38,7 @@ def weather():
 	global cold
 	global rain
 
-	if not wunderground_api_key: # If the API key doesn't exist, just return normal weather
+	if not wunderground_api_key: # If the API key doesn't exist, just return weather as normal
 		return str(0)
 	
 	if time.time() - last_weather_download_time > INTERVAL_CHECK_WEATHER:
@@ -87,7 +86,7 @@ def start_api():
 	start_tag = stop_key_route_and_title_value_tag[(route_tag, start_title)]
 	end_tag = stop_key_route_and_title_value_tag[(route_tag, end_title)]
 
-	print (start_tag, end_tag, route_tag)
+	# print (start_tag, end_tag, route_tag)
 
 	result = should_wait(start_tag, end_tag, route_tag, direction_tag)
 	wait_time = get_nextbus_time(start_tag, direction_tag, route_tag)

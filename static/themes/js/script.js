@@ -32,7 +32,6 @@ $(document).ready(function() {
 
 			determineWaitOrWalk(origin_stop, destination_stop,
 				function(should_wait, wait_time, weather) {
-					console.log([should_wait, wait_time]);
 					// Success
 					$("#thinking").addClass("hide");
 
