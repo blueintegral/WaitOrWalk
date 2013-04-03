@@ -66,18 +66,16 @@ def weather():
 
 @app.route('/shouldwait')
 def start_api():
-	if (not ('start' in request.args and 'end' in request.args)):
+	if not ('start' in request.args and 'end' in request.args):
 		return
-	#the page has passed both a start and end point
+	# the page has passed both a start and end point
 	start_tag = request.args['start']
 	end_tag = request.args['end']
 	
-	#Sanitize input
-	if not start_tag in stop_key_tag_value_title:
+	# Sanitize input
+	if not (start_tag in stop_key_tag_value_title and end_tag in stop_key_tag_value_title):
 		return
-	if not end_tag in stop_key_tag_value_title:
-		return
-	 
+		 
 	start_title = stop_key_tag_value_title[start_tag]
 	end_title = stop_key_tag_value_title[end_tag]
 
@@ -93,17 +91,21 @@ def start_api():
 	return ' '.join([str(result), str(wait_time)])
 
 def should_wait(start_tag, end_tag, route_tag, direction_tag):
-	'''Actually makes the decision to wait or walk '''
-	#First get the time until next bus
+	'''Actually makes the decision to wait or walk. Returns 1 for waiting (basically wait for bus), or 0 to walk '''
+	# First get the time until next bus
 	wait_time = get_nextbus_time(start_tag, direction_tag, route_tag)
-	#Now add drive time to that. This should also include amount of time spent at stops.
-	#Add an extra 15 seconds per stop made on the way
+	# Now add drive time to that. This should also include amount of time spent at stops.
+	# Add an extra 15 seconds per stop made on the way
 	drive_time = get_time(start_tag, end_tag, "driving") 
+	print ("Drive time:" , drive_time)
 	stops = stops_between(start_tag, end_tag, route_tag, direction_tag)
-	wait_time = wait_time + drive_time +  0.25*stops #that's .25 minutes
+	print ("Stops Time",	 0.25*stops)
+	print ("Wait time", wait_time)
+	wait_time = wait_time + drive_time +  0.25*stops # that's .25 minutes
 	#Get walk time
 	walk_time = get_time(start_tag, end_tag, "walking")
 	
+	print ("Wait:", wait_time, "Walk:", walk_time)
 	#compare two times
 	if(wait_time < walk_time):
 		return 1
@@ -137,7 +139,7 @@ def get_nextbus_time(stop, direction, route):
 		if prediction and prediction.find('div'):
 			result = prediction.find('div').string.split(';')[1].strip()
 
-			if result == "Arriving":
+			if result == "Arriving" or result == "Departing":
 				result = 0
 		else:
 			result = DEFAULT_MAX_TIME
@@ -176,8 +178,7 @@ if __name__ == '__main__':
 	try:
 		wunderground_api_key = config.get("WeatherUnderground", "API_Key")
 	except ConfigParser.Error:
-		pass
-		# raise ValueError("Weather Underground API key not set.")
+		print "Weather Underground API key not set."
 
 	app.debug = os.environ.get('DEBUG', True)
 

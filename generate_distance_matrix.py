@@ -49,11 +49,12 @@ for i in range(len(bus_stops)):
 
 
 def format_coordinates(bus_stops):
-	gps_list = []
+	coordinate_list = []
 	for bus_stop in bus_stops:
-		(stop_tag, gps) = bus_stop
-		gps_list.append(gps)
-	return "|".join(gps_list)
+		(stop_tag, coordinate) = bus_stop
+		coordinate_list.append(coordinate)
+
+	return "|".join(coordinate_list)
 
 def get_times(mode):
 	"""Get the travel time either walking or driving to all the bus stops.
@@ -65,12 +66,10 @@ def get_times(mode):
 
 	# Mode is either walking or driving
 
-	index = 0
-	
-	for bus_stop in bus_stops:
-		print "Fetching " + bus_stop[0] + " walk times..."
+	for index, bus_stop in enumerate(bus_stops):
+		print "Fetching " + bus_stop[0] + " " + mode + " times..."
 		
-		if os.path.isfile("data/"+mode+"/" + bus_stop[0] + ".json"):
+		if os.path.isfile("data/" + mode + "/" + bus_stop[0] + ".json"):
 			print "Path information already exists" # Skipping over routes that already exist
 			continue
 
@@ -83,8 +82,6 @@ def get_times(mode):
 
 		with open("data/" + mode + "/" + bus_stop[0] + ".json", 'w') as output_file:
 			json.dump(json_response, output_file)
-
-		index = index + 1
 
 		# Wait for rate limit
 		time.sleep(8)
