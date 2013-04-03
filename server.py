@@ -4,6 +4,7 @@ import os
 import time
 import urllib2
 import re
+import ConfigParser
 from v2methods import *
 
 from BeautifulSoup import BeautifulSoup
@@ -14,6 +15,9 @@ app = Flask(__name__)
 last_weather_download_time = time.time()
 cold = False
 rain = False
+
+wunderground_api_key = ""
+
 # Constants
 DEFAULT_MAX_TIME = 1000
 COLD_BELOW_TEMP = 60
@@ -34,7 +38,7 @@ def weather():
 
 	if time.time() - last_weather_download_time > 300:
 		last_weather_download_time = time.time() # Reset timer
-		url_result = urllib2.urlopen('http://api.wunderground.com/api/your-api-key-here/conditions/q/30332.json')
+		url_result = urllib2.urlopen('http://api.wunderground.com/api/' + wunderground_api_key + '/conditions/q/30332.json')
 		raw_json = url_result.read()
 		parsed_json = json.loads(raw_json)
 
@@ -193,6 +197,14 @@ def get_time(start, end, method):
 
 if __name__ == '__main__':
 	port = int(os.environ.get('PORT', 80))
+
+	config = ConfigParser.ConfigParser()
+	config.read("config.ini")
+
+	try:
+		wunderground_api_key = config.get("WeatherUnderground", "API_Key")
+	except ConfigParser.Error:
+		raise ValueError("Weather Underground API key not set.")
 
 	app.debug = os.environ.get('DEBUG', True)
 
