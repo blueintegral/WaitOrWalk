@@ -5,6 +5,8 @@ import time
 import urllib2
 import re
 from v2methods import *
+import generate_distance_matrix
+
 
 from BeautifulSoup import BeautifulSoup
 from flask import Flask, render_template, request
@@ -17,6 +19,7 @@ rain = False
 # Constants
 DEFAULT_MAX_TIME = 1000
 COLD_BELOW_TEMP = 60
+INTERVAL_CHECK_WEATHER = 300
 
 
 @app.route('/')
@@ -34,7 +37,7 @@ def weather():
 	global cold
 	global rain
 
-	if time.time() - last_weather_download_time > 300:
+	if time.time() - last_weather_download_time > INTERVAL_CHECK_WEATHER:
 		last_weather_download_time = time.time() # Reset timer
 		url_result = urllib2.urlopen('http://api.wunderground.com/api/your-api-key-here/conditions/q/30332.json')
 		raw_json = url_result.read()
@@ -133,6 +136,8 @@ def get_nextbus_time(stop, direction, route):
 def get_time(start, end, method):
 	#Get distance matrix for this trip
 	#	Needs to be fixed when walking data has all stops information
+
+	print((start, end))
 	
 	if not os.path.isfile("data/"+method+"/"+start+".json"):
 		print "ERROR STARTING STOP DOESN'T EXIST ERROR"
@@ -142,41 +147,7 @@ def get_time(start, end, method):
 	raw_json = open("data/" + method + "/" + start + ".json").read()
 	parsed_json = json.loads(raw_json)
 
-	# Figure out destination number
-	if end == "fitten":
-		end = 0
-	if end == "mcm8th":
-		end = 1
-	if end == "8thhemp":
-		end = 2
-	if end == "fershemrt":
-		end = 3
-	if end == "fersstmrt":
-		end = 4
-	if end == "fersatmrt":
-		end = 5
-	if end == "ferschmrt":
-		end = 6
-	if end == "5thfowl":
-		end = 7
-	if end == "tech5th":
-		end = 8
-	if end == "tech4th":
-		end = 9
-	if end == "techbob":
-		end = 10
-	if end == "technorth":
-		end = 11
-	if end == "nortavea_a":
-		end = 12
-	if end == "ferstcher":
-		end = 13
-	if end == "hubfers":
-		end = 14
-	if end == "centrstud":
-		end = 15
-	if end == "765femrt":
-		end = 16
+	end = generate_distance_matrix.key_stop_tag_value_index[end]
 
 	# Needs to be fixed when walking data has all stops information
 	if isinstance(end, str) or isinstance(end, unicode):

@@ -1,6 +1,7 @@
 import json
 import pprint
 import urllib2
+import generate_distance_matrix
 
 data_json = json.load(open('data/routeconfig.txt'))
 
@@ -96,3 +97,5 @@ def stop_title_to_stop_tag_for_route(stop_title, route_tag):
 
 construct_route_information()
 construct_shared_stops()
+
+pprint.pprint(shared_stops)
