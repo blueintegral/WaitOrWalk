@@ -274,21 +274,21 @@
                 },
                 {
                     "tag": "3rdtech",
-                    "title": "Techwood Dr & 3rd Street",
+                    "title": "Techwood Dr & 3rd St",
                     "lat": "33.7740614",
                     "lon": "-84.39192",
                     "stopid": "0050"
                 },
                 {
                     "tag": "4thtech",
-                    "title": "Techwood Dr & 4th Street",
+                    "title": "Techwood Dr & 4th St",
                     "lat": "33.7750658",
                     "lon": "-84.3919399",
                     "stopid": "0051"
                 },
                 {
                     "tag": "5thtech",
-                    "title": "Techwood Dr & 5th Street",
+                    "title": "Techwood Dr & 5th St",
                     "lat": "33.77676",
                     "lon": "-84.39206",
                     "stopid": "0053"

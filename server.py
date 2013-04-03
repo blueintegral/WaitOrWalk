@@ -6,6 +6,7 @@ import urllib2
 import re
 import ConfigParser
 from v2methods import *
+import generate_distance_matrix
 
 from BeautifulSoup import BeautifulSoup
 from flask import Flask, render_template, request
@@ -21,6 +22,7 @@ wunderground_api_key = ""
 # Constants
 DEFAULT_MAX_TIME = 1000
 COLD_BELOW_TEMP = 60
+INTERVAL_CHECK_WEATHER = 300
 
 route_list_json = open('data/routeconfig.txt')
 route_list = json.load(route_list_json)
@@ -36,7 +38,10 @@ def weather():
 	global cold
 	global rain
 
-	if time.time() - last_weather_download_time > 300:
+	if not wunderground_api_key: # If the API key doesn't exist, just return weather as normal
+		return str(0)
+	
+	if time.time() - last_weather_download_time > INTERVAL_CHECK_WEATHER:
 		last_weather_download_time = time.time() # Reset timer
 		url_result = urllib2.urlopen('http://api.wunderground.com/api/' + wunderground_api_key + '/conditions/q/30332.json')
 		raw_json = url_result.read()
@@ -66,10 +71,11 @@ def start_api():
 	#the page has passed both a start and end point
 	start_tag = request.args['start']
 	end_tag = request.args['end']
+	
 	#Sanitize input
-	if (not (any (start_tag in s["tag"] for s in route_list["route"][0]["stop"]))):
+	if not start_tag in stop_key_tag_value_title:
 		return
-	if (not (any (end_tag in s["tag"] for s in route_list["route"][0]["stop"]))):
+	if not end_tag in stop_key_tag_value_title:
 		return
 	 
 	start_title = stop_key_tag_value_title[start_tag]
@@ -84,7 +90,7 @@ def start_api():
 
 	result = should_wait(start_tag, end_tag, route_tag, direction_tag)
 	wait_time = get_nextbus_time(start_tag, direction_tag, route_tag)
-	return  ' '.join([str(result), str(wait_time)])
+	return ' '.join([str(result), str(wait_time)])
 
 def should_wait(start_tag, end_tag, route_tag, direction_tag):
 	'''Actually makes the decision to wait or walk '''
@@ -139,10 +145,10 @@ def get_nextbus_time(stop, direction, route):
 	return int(result)
 
 def get_time(start, end, method):
-	#Get distance matrix for this trip
-	#	Needs to be fixed when walking data has all stops information
+	# Get distance matrix for this trip
 	
-	if not os.path.isfile("data/"+method+"/"+start+".json"):
+	# This might not be needed anymore
+	if not os.path.isfile("data/" + method + "/" + start + ".json"):
 		print "ERROR STARTING STOP DOESN'T EXIST ERROR"
 		return	DEFAULT_MAX_TIME
 
@@ -150,46 +156,12 @@ def get_time(start, end, method):
 	raw_json = open("data/" + method + "/" + start + ".json").read()
 	parsed_json = json.loads(raw_json)
 
-	# Figure out destination number
-	if end == "fitten":
-		end = 0
-	if end == "mcm8th":
-		end = 1
-	if end == "8thhemp":
-		end = 2
-	if end == "fershemrt":
-		end = 3
-	if end == "fersstmrt":
-		end = 4
-	if end == "fersatmrt":
-		end = 5
-	if end == "ferschmrt":
-		end = 6
-	if end == "5thfowl":
-		end = 7
-	if end == "tech5th":
-		end = 8
-	if end == "tech4th":
-		end = 9
-	if end == "techbob":
-		end = 10
-	if end == "technorth":
-		end = 11
-	if end == "nortavea_a":
-		end = 12
-	if end == "ferstcher":
-		end = 13
-	if end == "hubfers":
-		end = 14
-	if end == "centrstud":
-		end = 15
-	if end == "765femrt":
-		end = 16
-
-	# Needs to be fixed when walking data has all stops information
-	if isinstance(end, str) or isinstance(end, unicode):
+	# This might not be needed anymore
+	if end not in generate_distance_matrix.key_stop_tag_value_index:
 		print "ERROR ENDING STOP DOESN'T EXIST ERROR"
 		return	DEFAULT_MAX_TIME	
+
+	end = generate_distance_matrix.key_stop_tag_value_index[end]
 		
 	expected_time = parsed_json["rows"][0]["elements"][end]["duration"]["value"]
 	expected_time = int(expected_time) / 60 # Convert to minutes
@@ -204,7 +176,8 @@ if __name__ == '__main__':
 	try:
 		wunderground_api_key = config.get("WeatherUnderground", "API_Key")
 	except ConfigParser.Error:
-		raise ValueError("Weather Underground API key not set.")
+		pass
+		# raise ValueError("Weather Underground API key not set.")
 
 	app.debug = os.environ.get('DEBUG', True)
 
