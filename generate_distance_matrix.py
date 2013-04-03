@@ -5,7 +5,6 @@ import time
 import os
 
 """This script will call Google Maps to calculate the time to walk between every combination of bus stops and the time to drive between every combination of bus stops.
-
 We can't do this live in the app because of rate limiting and because Google requires you show a map.
 """
 
@@ -58,20 +57,14 @@ def format_GPS_coordinates(bus_stops):
 
 def get_times(walking):
 	"""Get the travel time either walking or driving to all the bus stops.
-
 	We'll have to go through each of the N stops with one origin and all N-1 other stops as destinations. 
-
 	This will result in fitten.json, mcm8th.json, etc...
-
 	Then you can access the JSON for the specific starting point, find the destination, and get the travel time.
-
 	Rate limiting prevents doing this in a more elegant way with fewer API calls.
 	"""
 
 	index = 0
 	mode = "walking" if walking else "driving"
-
-
 
 	for bus_stop in bus_stops:
 		print "Fetching " + bus_stop[0] + " walk times..."
@@ -96,17 +89,19 @@ def get_times(walking):
 		index = index + 1
 		# return
 		# Wait for rate limit
-		time.sleep(5)
+		time.sleep(8)
 
 if __name__ == '__main__':
-	print "This will take about 10 minutes, so sit tight."
+	print "This can take a long time, the server will throw a OVER_QUERY_LIMIT if there are many requests"
+	# Uncomment the get_times as necessary 
+
 
 	# Make the driving directory if it does not exist
 	# if not os.path.exists("data/driving"):
 		# os.makedirs("data/driving")
 
 	# Get the times to drive to all the bus stops
-	get_times(False)
+	# get_times(False)
 
 	# Make the walking directory if it does not exist
 	if not os.path.exists("data/walking"):
