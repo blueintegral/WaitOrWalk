@@ -97,5 +97,3 @@ def stop_title_to_stop_tag_for_route(stop_title, route_tag):
 
 construct_route_information()
 construct_shared_stops()
-
-pprint.pprint(shared_stops)

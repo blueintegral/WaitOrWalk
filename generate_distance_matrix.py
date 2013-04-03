@@ -48,7 +48,7 @@ for i in range(len(bus_stops)):
 	key_stop_tag_value_index[stop_tag] = i
 
 
-def format_GPS_coordinates(bus_stops):
+def format_coordinates(bus_stops):
 	gps_list = []
 	for bus_stop in bus_stops:
 		(stop_tag, gps) = bus_stop
@@ -70,16 +70,13 @@ def get_times(walking):
 		print "Fetching " + bus_stop[0] + " walk times..."
 		
 		if os.path.isfile("data/"+mode+"/" + bus_stop[0] + ".json"):
-			print "already done" # Skipping over routes that already exist
+			print "Path information already exists" # Skipping over routes that already exist
 			continue
 
-		gps_formatted = format_GPS_coordinates(bus_stops)
+		coordinates_formatted = format_coordinates(bus_stops)
 		
-		url = "http://maps.googleapis.com/maps/api/distancematrix/json?origins=" + bus_stop[1] + "&destinations=" + gps_formatted + "&sensor=false&mode=" + mode
+		url = "http://maps.googleapis.com/maps/api/distancematrix/json?origins=" + bus_stop[1] + "&destinations=" + coordinates_formatted + "&sensor=false&mode=" + mode
 		
-
-		print url
-
 		# Write the data to the file
 		json_response = json.load(urllib2.urlopen(url))
 
@@ -87,7 +84,7 @@ def get_times(walking):
 			json.dump(json_response, output_file)
 
 		index = index + 1
-		# return
+
 		# Wait for rate limit
 		time.sleep(8)
 
@@ -95,10 +92,9 @@ if __name__ == '__main__':
 	print "This can take a long time, the server will throw a OVER_QUERY_LIMIT if there are many requests"
 	# Uncomment the get_times as necessary 
 
-
 	# Make the driving directory if it does not exist
-	# if not os.path.exists("data/driving"):
-		# os.makedirs("data/driving")
+	if not os.path.exists("data/driving"):
+		os.makedirs("data/driving")
 
 	# Get the times to drive to all the bus stops
 	# get_times(False)
