@@ -1,4 +1,5 @@
 venv
 *.pyc
 .DS_Store
+WaitOrwalk.sublime-*
 config.ini

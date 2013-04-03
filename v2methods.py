@@ -1,6 +1,7 @@
 import json
 import pprint
 import urllib2
+import generate_distance_matrix
 
 data_json = json.load(open('data/routeconfig.txt'))
 
