@@ -15,6 +15,8 @@ $(document).ready(function() {
 			$("#originText").addClass("hide");
 			$("#destinationText").removeClass("hide");
 
+			$(document).scrollTop(0, 0);
+
 			$("#stops a").addClass("btn-danger");
 		} else {
 			destination_stop = $(this).data("id");
