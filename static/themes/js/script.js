@@ -38,7 +38,7 @@ $(document).ready(function() {
 					if (should_wait) {
 						shouldWait();
 					} else {
-						shouldWalk();
+						shouldWalk(wait_time, weather);
 					}
 
 					$("#again").removeClass("hide");
