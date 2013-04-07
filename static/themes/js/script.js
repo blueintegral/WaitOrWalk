@@ -135,6 +135,10 @@ function getWeather(success, failure) {
 			}).fail(function() {
 				return failure();
 			});
+		} else {
+			return success(0);
 		}
+	} else {
+		return success(0);
 	}
 }
