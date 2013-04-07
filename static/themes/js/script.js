@@ -32,6 +32,7 @@ $(document).ready(function() {
 
 			determineWaitOrWalk(origin_stop, destination_stop,
 				function(should_wait, wait_time, weather) {
+					console.log("success");
 					// Success
 					$("#thinking").addClass("hide");
 
@@ -65,6 +66,7 @@ function reset() {
 
 	$("#thinking").addClass("hide");
 	$("#results").addClass("hide");
+	$("#out-of-service").addClass("hide");
 	$("#again").addClass("hide");
 
 	$("#setup").removeClass("hide");
@@ -102,15 +104,17 @@ function determineWaitOrWalk(origin, destination, success, failure) {
 			url: "/shouldwait",
 			data: data
 	}).done(function(result) {
-		var should_wait = result.slice(0, 1) == 1 ? true : false;
-		var wait_time = result.slice(2, 4);
-		var weather;
+		str_split = result.split(' ');
 
+		var should_wait = str_split[0] == 1 ? true : false;
+		var wait_time = str_split[1];
+
+		console.log([should_wait, wait_time, result]);
 		getWeather(function(result) {
+			console.log("got weather");
 			return success(should_wait, wait_time, result);
 		}, function() {
 			console.error("Could not get weather.");
-
 			return success(should_wait, wait_time, 0);
 		});
 	}).fail(function() {
@@ -127,6 +131,7 @@ function getWeather(success, failure) {
 	// Buses operate M-F from 7 AM to 10 PM
 	if (now.getDay() >= 1 && now.getDay() <= 5) {
 		if (now.getHours() > 7 && now.getHours() < 22) {
+			console.log("stuff");
 			// Buses are operating
 			$.ajax({
 				url: "/weather"
@@ -137,4 +142,10 @@ function getWeather(success, failure) {
 			});
 		}
 	}
+
+	$("#results").removeClass("hide");
+	$("#thinking").addClass("hide");
+	$("#out-of-service").removeClass("hide");
+	$("#again").removeClass("hide");
+
 }

@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="{{url_for('static', filename='themes/css/style.css')}}">
 	<link rel="stylesheet" href="{{url_for('static', filename='themes/css/bootstrap-responsive.css')}}">
 
+	<!-- <script src="{{url_for('static', filename='themes/js/jquery.min.js')}}"></script> -->
 	<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 	<script src="{{url_for('static', filename='themes/js/script.js')}}"></script>
 </head>
@@ -53,6 +54,11 @@
 
 					<h3 class="hide" id="rain">It looks rainy though, so if you can hang around for <span id="time"></span> minutes.</h3>
 					<h3 class="hide" id="cold">It looks colds though, so if you can hang around for <span id="time"></span> minutes.</h3>
+
+					<div class="hide" id="out-of-service">
+						<h2>Red or Blue routes are not in operation.</h2>
+					</div>
+
 				</div>
 			</div>
 
