@@ -122,8 +122,11 @@ function determineWaitOrWalk(origin, destination, success, failure) {
 	}).done(function(result) {
 		// Server responded - extract the data
 
-		var should_wait = result.slice(0, 1) == 1 ? true : false;
-		var wait_time = result.slice(2, 4);
+		result_split = result.split(' ');
+
+		var should_wait = result_split[0] == 1 ? true : false;
+		var wait_time = result_split[1];
+
 		var weather;
 
 		// Get the weather

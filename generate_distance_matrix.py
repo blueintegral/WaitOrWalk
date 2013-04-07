@@ -47,15 +47,6 @@ for i in range(len(bus_stops)):
 	(stop_tag, coord) = bus_stops[i]
 	key_stop_tag_value_index[stop_tag] = i
 
-
-def format_coordinates(bus_stops):
-	coordinate_list = []
-	for bus_stop in bus_stops:
-		(stop_tag, coordinate) = bus_stop
-		coordinate_list.append(coordinate)
-
-	return "|".join(coordinate_list)
-
 def get_times(mode):
 	"""Get the travel time either walking or driving to all the bus stops.
 	We'll have to go through each of the N stops with one origin and all N-1 other stops as destinations. 
@@ -73,7 +64,7 @@ def get_times(mode):
 			print "Path information already exists" # Skipping over routes that already exist
 			continue
 
-		coordinates_formatted = format_coordinates(bus_stops)
+		coordinates_formatted = "|".join([coordinate for (stop_tag, coordinate) in bus_stops])
 		
 		url = "http://maps.googleapis.com/maps/api/distancematrix/json?origins=" + bus_stop[1] + "&destinations=" + coordinates_formatted + "&sensor=false&mode=" + mode
 		
@@ -88,7 +79,6 @@ def get_times(mode):
 
 if __name__ == '__main__':
 	print "This can take a long time, the server will throw a OVER_QUERY_LIMIT if there are many requests"
-	# Uncomment the get_times as necessary 
 
 	# Make the driving directory if it does not exist
 	if not os.path.exists("data/driving"):
