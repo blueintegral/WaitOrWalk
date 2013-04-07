@@ -38,7 +38,7 @@ $(document).ready(function() {
 					if (should_wait) {
 						shouldWait();
 					} else {
-						shouldWalk();
+						shouldWalk(wait_time, weather);
 					}
 
 					$("#again").removeClass("hide");
@@ -135,6 +135,10 @@ function getWeather(success, failure) {
 			}).fail(function() {
 				return failure();
 			});
+		} else {
+			return success(0);
 		}
+	} else {
+		return success(0);
 	}
 }
