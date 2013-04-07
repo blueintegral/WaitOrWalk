@@ -7,7 +7,12 @@ $(document).ready(function() {
 	pick_origin = true;
 
 	$("#stops a").click(function() {
+		// When any of the stop buttons are clicked...
+
 		if (pick_origin) {
+			// This is the first time we've clicked (i.e. the origin)
+			// Remember the stop ID and move onto choosing the destination
+
 			origin_stop = $(this).data("id");
 
 			pick_origin = false;
@@ -19,6 +24,9 @@ $(document).ready(function() {
 
 			$("#stops a").addClass("btn-danger");
 		} else {
+			// This is the second time we've clicked (i.e. the destination)
+			// Remember the stop ID and begin to show the results
+
 			destination_stop = $(this).data("id");
 
 			$("#setup").addClass("hide");
@@ -26,37 +34,41 @@ $(document).ready(function() {
 			$("#originText").removeClass("hide");
 			$("#destinationText").addClass("hide");
 
+			// Start to compute the results
 			$("#stops").addClass("hide");
 
 			$("#thinking").removeClass("hide");
 
 			determineWaitOrWalk(origin_stop, destination_stop,
 				function(should_wait, wait_time, weather) {
-					console.log("success");
-					// Success
+					// Success - The server has returned a result
+					
 					$("#thinking").addClass("hide");
 
 					if (should_wait) {
 						shouldWait();
 					} else {
-						shouldWalk();
+						shouldWalk(wait_time, weather);
 					}
 
 					$("#again").removeClass("hide");
 					
 					$("#results").removeClass("hide");
 				}, function() {
-					// Failure
+					// Failure - The server returned something bad
+					
 					reset();
 			});
 		}
 	});
 
 	$("#again a").click(function() {
+		// Reset back to choosing the origin if the again button is clicked
 		reset();
 	});
 });
 
+// Reset all elements back to their initial setup
 function reset() {
 	$("#rain").addClass("hide");
 	$("#cold").addClass("hide");
@@ -66,7 +78,6 @@ function reset() {
 
 	$("#thinking").addClass("hide");
 	$("#results").addClass("hide");
-	$("#out-of-service").addClass("hide");
 	$("#again").addClass("hide");
 
 	$("#setup").removeClass("hide");
@@ -77,6 +88,7 @@ function reset() {
 	pick_origin = true;
 }
 
+// Show the walk elements given the wait time for a bus and the weather conditions
 function shouldWalk(wait_time, weather) {
 	$("#walk").removeClass("hide");
 
@@ -93,37 +105,52 @@ function shouldWalk(wait_time, weather) {
 	}
 }
 
+// Show the wait elements
 function shouldWait() {
 	$("#wait").removeClass("hide");
 }
 
+// Determine whether we should wait/walk from origin to dest
 function determineWaitOrWalk(origin, destination, success, failure) {
+	// Make a call to the server API with the start/end as params
+
 	var data = { "start": origin, "end": destination };
 
 	$.ajax({
 			url: "/shouldwait",
 			data: data
 	}).done(function(result) {
-		str_split = result.split(' ');
+		// Server responded - extract the data
 
-		var should_wait = str_split[0] == 1 ? true : false;
-		var wait_time = str_split[1];
+		result_split = result.split(' ');
 
-		console.log([should_wait, wait_time, result]);
+		var should_wait = result_split[0] == 1 ? true : false;
+		var wait_time = result_split[1];
+
+		var weather;
+
+		// Get the weather
 		getWeather(function(result) {
-			console.log("got weather");
+			// Got the weather
+			
 			return success(should_wait, wait_time, result);
 		}, function() {
+			// Server could not get the weather for some reason
+			
 			console.error("Could not get weather.");
+
 			return success(should_wait, wait_time, 0);
 		});
 	}).fail(function() {
+		// Server did not respond
+
 		console.error("Could not determine whether to wait or walk.");
 
 		return failure();
 	});
 }
 
+// Get the weather from the server
 function getWeather(success, failure) {
 	var now = new Date();
 
@@ -131,21 +158,22 @@ function getWeather(success, failure) {
 	// Buses operate M-F from 7 AM to 10 PM
 	if (now.getDay() >= 1 && now.getDay() <= 5) {
 		if (now.getHours() > 7 && now.getHours() < 22) {
-			console.log("stuff");
 			// Buses are operating
 			$.ajax({
 				url: "/weather"
 			}).done(function(result) {
+				// Got the weather
+
 				return success(result);
 			}).fail(function() {
+				// Server did not respond
+
 				return failure();
 			});
+		} else {
+			return success(0);
 		}
+	} else {
+		return success(0);
 	}
-
-	$("#results").removeClass("hide");
-	$("#thinking").addClass("hide");
-	$("#out-of-service").removeClass("hide");
-	$("#again").removeClass("hide");
-
 }
