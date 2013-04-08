@@ -212,8 +212,8 @@
                 {
                     "tag": "mcm8th",
                     "title": "McMillian St & 8th St",
-                    "lat": "33.779598",
-                    "lon": "-84.4041646",
+                    "lat": "33.7795985",
+                    "lon": "-84.4041643",
                     "stopid": "0030"
                 },
                 {
@@ -268,8 +268,8 @@
                 {
                     "tag": "technorth",
                     "title": "Techwood Dr & North Ave",
-                    "lat": "33.7718568",
-                    "lon": "-84.3919202",
+                    "lat": "33.7714504",
+                    "lon": "-84.3920998",
                     "stopid": "0056"
                 },
                 {
