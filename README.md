@@ -1,5 +1,7 @@
 Wait or Walk
 ------------
+http://waitorwalk.com
+
 A webapp to answer the question you really have at the bus stop: should I wait or should I walk?
 
 Scrapes Nextbus (since their public API isn't open for Georgia Tech) and uses the Google Maps API to calculate walking times and distances.
